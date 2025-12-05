@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情绪陪伴 - 悦养</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #f8fafc;
+            padding-bottom: 80px;
+        }
+        .app-header {
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 0.5rem 0;
+            z-index: 1000;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .nav-item.active {
+            color: #F59E0B;
+        }
+        .nav-item:hover {
+            color: #F59E0B;
+        }
+        .mood-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .mood-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        .mood-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .mood-item {
+            text-align: center;
+            padding: 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        .mood-item:hover {
+            border-color: #F59E0B;
+            background: #fffbeb;
+        }
+        .mood-item.selected {
+            border-color: #F59E0B;
+            background: #fef3c7;
+        }
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .chat-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            margin: 0.5rem 0;
+            position: relative;
+            word-wrap: break-word;
+        }
+        .chat-bubble.user {
+            background: #F59E0B;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0.25rem;
+        }
+        .chat-bubble.ai {
+            background: white;
+            color: #374151;
+            margin-right: auto;
+            border-bottom-left-radius: 0.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .mood-history-item {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid #F59E0B;
+        }
+        .mood-chart {
+            height: 300px;
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .floating-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: #F59E0B;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+        .floating-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- 应用头部 -->
+    <header class="app-header">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <h1 class="text-xl font-bold" style="font-family: 'ZCOOL KuaiLe', cursive;">悦养</h1>
+                <span class="text-sm opacity-90">情绪陪伴中心</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="text-sm" id="userGreeting">你好！</span>
+                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <span>👤</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="px-4 py-6 space-y-6">
+        <!-- 今日情绪记录 -->
+        <div class="mood-card">
+            <h2 class="text-lg font-bold text-gray-900 mb-4">今日情绪记录</h2>
+            <div class="mood-selector">
+                <div class="mood-item" onclick="selectTodayMood('happy')">
+                    <div class="text-3xl mb-2">😊</div>
+                    <div class="text-sm font-medium">开心</div>
+                </div>
+                <div class="mood-item" onclick="selectTodayMood('tired')">
+                    <div class="text-3xl mb-2">😴</div>
+                    <div class="text-sm font-medium">疲惫</div>
+                </div>
+                <div class="mood-item" onclick="selectTodayMood('stressed')">
+                    <div class="text-3xl mb-2">😰</div>
+                    <div class="text-sm font-medium">压力</div>
+                </div>
+                <div class="mood-item" onclick="selectTodayMood('anxious')">
+                    <div class="text-3xl mb-2">😟</div>
+                    <div class="text-sm font-medium">焦虑</div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <textarea id="moodNote" placeholder="写下你的想法或感受..." class="w-full p-3 border rounded-lg focus:outline-none focus:border-orange-500" rows="3"></textarea>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button onclick="saveTodayMood()" class="flex-1 bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition-colors">
+                    保存情绪记录
+                </button>
+            </div>
+        </div>
+
+        <!-- AI情绪树洞 -->
+        <div class="mood-card">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">AI情绪树洞</h3>
+            <div class="chat-container" id="moodChatContainer">
+                <div class="chat-bubble ai">
+                    嗨！我是你的专属情绪陪伴师，有什么心事都可以跟我说哦～我会用心倾听，给你温暖的回应。
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <input type="text" id="moodChatInput" placeholder="分享你的想法..." class="flex-1 p-3 border rounded-lg focus:outline-none focus:border-orange-500">
+                <button onclick="sendMoodMessage()" class="bg-orange-500 text-white px-4 py-3 rounded-lg hover:bg-orange-600 transition-colors">
+                    发送
+                </button>
+            </div>
+        </div>
+
+        <!-- 情绪充电站 -->
+        <div class="mood-card">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">情绪充电站</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-lg text-center cursor-pointer hover:shadow-md transition-shadow" onclick="openRelaxContent('music')">
+                    <div class="text-3xl mb-2">🎵</div>
+                    <h4 class="font-semibold text-gray-900 mb-1">舒缓音乐</h4>
+                    <p class="text-sm text-gray-600">放松身心的音乐</p>
+                </div>
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg text-center cursor-pointer hover:shadow-md transition-shadow" onclick="openRelaxContent('meditation')">
+                    <div class="text-3xl mb-2">🧘</div>
+                    <h4 class="font-semibold text-gray-900 mb-1">冥想指导</h4>
+                    <p class="text-sm text-gray-600">专业冥想练习</p>
+                </div>
+                <div class="bg-gradient-to-br from-purple-50 to-violet-50 p-4 rounded-lg text-center cursor-pointer hover:shadow-md transition-shadow" onclick="openRelaxContent('breathing')">
+                    <div class="text-3xl mb-2">💨</div>
+                    <h4 class="font-semibold text-gray-900 mb-1">呼吸练习</h4>
+                    <p class="text-sm text-gray-600">调节呼吸节奏</p>
+                </div>
+                <div class="bg-gradient-to-br from-pink-50 to-rose-50 p-4 rounded-lg text-center cursor-pointer hover:shadow-md transition-shadow" onclick="openRelaxContent('article')">
+                    <div class="text-3xl mb-2">📖</div>
+                    <h4 class="font-semibold text-gray-900 mb-1">治愈文章</h4>
+                    <p class="text-sm text-gray-600">温暖治愈文字</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 情绪历史 -->
+        <div class="mood-card">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">情绪历史记录</h3>
+            <div id="moodHistory">
+                <!-- 动态生成情绪历史 -->
+            </div>
+            <div class="text-center mt-4">
+                <button onclick="loadMoreMoodHistory()" class="text-orange-600 text-sm font-medium hover:text-orange-700">
+                    查看更多历史记录
+                </button>
+            </div>
+        </div>
+
+        <!-- 情绪趋势图表 -->
+        <div class="mood-card">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">情绪变化趋势</h3>
+            <div class="mood-chart" id="moodChart"></div>
+        </div>
+    </main>
+
+    <!-- 浮动按钮 -->
+    <div class="floating-btn" onclick="showQuickMoodActions()">
+        <span>💝</span>
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+        <div class="flex">
+            <a href="index.html" class="nav-item">
+                <div class="text-xl mb-1">🏠</div>
+                <div class="text-xs">首页</div>
+            </a>
+            <a href="tasks.html" class="nav-item">
+                <div class="text-xl mb-1">🎯</div>
+                <div class="text-xs">任务</div>
+            </a>
+            <a href="mood.html" class="nav-item active">
+                <div class="text-xl mb-1">💝</div>
+                <div class="text-xs">情绪</div>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="text-xl mb-1">👤</div>
+                <div class="text-xs">我的</div>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 放松内容模态框 -->
+    <div id="relaxModal" class="modal">
+        <div class="modal-content max-w-md w-full mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-900" id="relaxTitle">放松内容</h3>
+                <button onclick="closeModal('relaxModal')" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div id="relaxContent">
+                <!-- 动态生成放松内容 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 情绪数据
+        let currentMood = null;
+        let moodChart = null;
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAppData();
+            initializeMoodPage();
+            renderMoodHistory();
+            initializeMoodChart();
+        });
+
+        // 加载应用数据
+        function loadAppData() {
+            const savedData = localStorage.getItem('yueyangAppData');
+            if (savedData) {
+                window.appData = { ...window.appData, ...JSON.parse(savedData) };
+            }
+        }
+
+        // 保存应用数据
+        function saveAppData() {
+            localStorage.setItem('yueyangAppData', JSON.stringify(window.appData));
+        }
+
+        // 初始化情绪页面
+        function initializeMoodPage() {
+            // 设置用户问候
+            const userGreeting = document.getElementById('userGreeting');
+            if (userGreeting) {
+                userGreeting.textContent = `你好，${window.appData.user.name}！`;
+            }
+
+            // 如果有今日情绪，显示选中状态
+            if (window.appData.mood.today) {
+                selectTodayMood(window.appData.mood.today);
+            }
+
+            // 初始化AI聊天
+            initializeMoodChat();
+        }
+
+        // 选择今日情绪
+        function selectTodayMood(mood) {
+            currentMood = mood;
+            
+            // 更新选择状态
+            document.querySelectorAll('.mood-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.target.closest('.mood-item').classList.add('selected');
+            
+            window.appData.mood.today = mood;
+            
+            const moodEmojis = {
+                happy: '😊',
+                tired: '😴',
+                stressed: '😰',
+                anxious: '😟'
+            };
+            
+            window.appData.mood.currentEmoji = moodEmojis[mood];
+            saveAppData();
+        }
+
+        // 保存今日情绪
+        function saveTodayMood() {
+            const note = document.getElementById('moodNote').value.trim();
+            
+            if (!currentMood) {
+                showToast('请先选择你的情绪状态', 'error');
+                return;
+            }
+            
+            const moodRecord = {
+                mood: currentMood,
+                note: note,
+                timestamp: new Date().toISOString()
+            };
+            
+            window.appData.mood.history.unshift(moodRecord);
+            window.appData.stats.totalMoodRecords++;
+            
+            showToast('情绪记录保存成功！', 'success');
+            
+            // 清空输入框
+            document.getElementById('moodNote').value = '';
+            
+            // 重新渲染情绪历史
+            renderMoodHistory();
+            
+            // 更新情绪图表
+            updateMoodChart();
+            
+            saveAppData();
+            
+            // AI回复
+            setTimeout(() => {
+                const aiResponse = generateMoodResponse(currentMood, note);
+                addMoodChatMessage(aiResponse, 'ai');
+            }, 1000);
+        }
+
+        // 初始化情绪聊天
+        function initializeMoodChat() {
+            const chatContainer = document.getElementById('moodChatContainer');
+            if (chatContainer && chatContainer.children.length <= 1) {
+                const welcomeMessages = [
+                    '我是你的专属情绪陪伴师，有什么心事都可以跟我说哦～',
+                    '每个人都会有情绪波动，这是很正常的事情。',
+                    '有时候把心里的话说出来，会感觉轻松很多。',
+                    '我在这里陪着你，一起面对生活中的喜怒哀乐。'
+                ];
+                
+                const randomMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+                addMoodChatMessage(randomMessage, 'ai');
+            }
+        }
+
+        // 发送情绪消息
+        function sendMoodMessage() {
+            const input = document.getElementById('moodChatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMoodChatMessage(message, 'user');
+            input.value = '';
+            
+            // AI回复
+            setTimeout(() => {
+                const aiResponse = generateMoodChatResponse(message);
+                addMoodChatMessage(aiResponse, 'ai');
+            }, 1000 + Math.random() * 1000);
+        }
+
+        // 添加情绪聊天消息
+        function addMoodChatMessage(message, type) {
+            const chatContainer = document.getElementById('moodChatContainer');
+            if (!chatContainer) return;
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `chat-bubble ${type}`;
+            messageElement.textContent = message;
+            
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // 动画效果
+            anime({
+                targets: messageElement,
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 500,
+                easing: 'easeOutQuad'
+            });
+        }
+
+        // 生成情绪响应
+        function generateMoodResponse(mood, note) {
+            const responses = {
+                happy: [
+                    '太棒了！保持这种好心情，今天一定会很顺利的！',
+                    '开心的心情是最好的养生良药，记得多分享快乐哦～',
+                    '看到你这么开心，我也很开心呢！继续保持这种积极的状态吧！'
+                ],
+                tired: [
+                    '疲惫的时候要注意休息哦，身体是最重要的！',
+                    '工作再忙也要照顾好自己，建议小憩15分钟恢复精力。',
+                    '疲劳是身体在提醒你需要休息，听听舒缓的音乐怎么样？'
+                ],
+                stressed: [
+                    '压力大的时候更要学会放松，试试5分钟的冥想吧～',
+                    '我理解你的压力，记得要给自己一些喘息的空间哦。',
+                    '压力是暂时的，相信你一定能够很好地处理！'
+                ],
+                anxious: [
+                    '焦虑的时候试试写下来，把担忧都写在纸上会好很多。',
+                    '深呼吸，一切都会好起来的。你很棒，要相信自己！',
+                    '焦虑是暂时的，做一些喜欢的事情转移注意力吧～'
+                ]
+            };
+            
+            const moodResponses = responses[mood] || responses.happy;
+            return moodResponses[Math.floor(Math.random() * moodResponses.length)];
+        }
+
+        // 生成情绪聊天响应
+        function generateMoodChatResponse(message) {
+            const keywords = {
+                '累': ['累了就要好好休息哦，身体是最重要的！', '疲惫的时候试试深呼吸，或者听些轻音乐～'],
+                '烦': ['我理解你的烦恼，说出来会好受一些。', '每个人都会有烦恼的时候，重要的是要学会调节。'],
+                '压力': ['压力大的时候更要学会放松，试试冥想吧～', '我理解你的压力，记得要给自己一些喘息的空间哦。'],
+                '开心': ['看到你开心我也很开心呢！', '保持好心情，今天一定会很顺利的！'],
+                '谢谢': ['不客气，这是我应该做的！', '能帮到你我也很开心～'],
+                '你好': ['你好呀！今天感觉怎么样？', '嗨！很高兴和你聊天～']
+            };
+            
+            for (const [keyword, responses] of Object.entries(keywords)) {
+                if (message.includes(keyword)) {
+                    return responses[Math.floor(Math.random() * responses.length)];
+                }
+            }
+            
+            const defaultResponses = [
+                '我明白了，继续说下去吧～',
+                '听起来很有意思，能详细说说吗？',
+                '我理解你的感受，想聊聊更多吗？',
+                '每个人都有这样的时刻，我们一起面对～',
+                '你说得对，这确实很重要。'
+            ];
+            
+            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+        }
+
+        // 渲染情绪历史
+        function renderMoodHistory() {
+            const historyElement = document.getElementById('moodHistory');
+            if (!historyElement) return;
+            
+            historyElement.innerHTML = '';
+            
+            const recentHistory = window.appData.mood.history.slice(0, 5);
+            
+            if (recentHistory.length === 0) {
+                historyElement.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="text-4xl mb-2">💝</div>
+                        <p>还没有情绪记录</p>
+                        <p class="text-sm">开始记录你的情绪变化吧～</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            recentHistory.forEach(record => {
+                const date = new Date(record.timestamp).toLocaleDateString('zh-CN');
+                const time = new Date(record.timestamp).toLocaleTimeString('zh-CN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const moodEmojis = {
+                    happy: '😊',
+                    tired: '😴',
+                    stressed: '😰',
+                    anxious: '😟'
+                };
+                
+                const moodNames = {
+                    happy: '开心',
+                    tired: '疲惫',
+                    stressed: '压力',
+                    anxious: '焦虑'
+                };
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'mood-history-item';
+                historyItem.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="text-2xl">${moodEmojis[record.mood]}</div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <span class="font-semibold text-gray-900">${moodNames[record.mood]}</span>
+                                <span class="text-xs text-gray-500">${date} ${time}</span>
+                            </div>
+                            ${record.note ? `<p class="text-sm text-gray-600">${record.note}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+                historyElement.appendChild(historyItem);
+            });
+        }
+
+        // 加载更多情绪历史
+        function loadMoreMoodHistory() {
+            showToast('历史记录功能开发中...', 'info');
+        }
+
+        // 初始化情绪图表
+        function initializeMoodChart() {
+            const chartElement = document.getElementById('moodChart');
+            if (!chartElement) return;
+            
+            moodChart = echarts.init(chartElement);
+            updateMoodChart();
+        }
+
+        // 更新情绪图表
+        function updateMoodChart() {
+            if (!moodChart) return;
+            
+            const last7Days = [];
+            const moodData = [];
+            
+            // 生成最近7天的数据
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                last7Days.push(date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }));
+                
+                // 查找当天的情绪记录
+                const dayRecord = window.appData.mood.history.find(record => 
+                    record.timestamp.split('T')[0] === dateStr
+                );
+                
+                if (dayRecord) {
+                    const moodScores = {
+                        happy: 4,
+                        tired: 2,
+                        stressed: 1,
+                        anxious: 1
+                    };
+                    moodData.push(moodScores[dayRecord.mood] || 3);
+                } else {
+                    moodData.push(3); // 默认中性情绪
+                }
+            }
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        const value = params[0].value;
+                        let moodText = '中性';
+                        if (value >= 4) moodText = '开心';
+                        else if (value <= 1) moodText = '低落';
+                        else if (value <= 2) moodText = '疲惫';
+                        
+                        return `${params[0].name}<br/>情绪状态: ${moodText}`;
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: last7Days,
+                    axisLine: { show: false },
+                    axisTick: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 0,
+                    max: 5,
+                    show: false
+                },
+                series: [{
+                    name: '情绪指数',
+                    type: 'line',
+                    data: moodData,
+                    smooth: true,
+                    lineStyle: {
+                        color: '#F59E0B',
+                        width: 3
+                    },
+                    itemStyle: {
+                        color: '#F59E0B'
+                    },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 0,
+                            y2: 1,
+                            colorStops: [{
+                                offset: 0, color: 'rgba(245, 158, 11, 0.3)'
+                            }, {
+                                offset: 1, color: 'rgba(245, 158, 11, 0.05)'
+                            }]
+                        }
+                    }
+                }],
+                grid: {
+                    left: 10,
+                    right: 10,
+                    top: 20,
+                    bottom: 30
+                }
+            };
+            
+            moodChart.setOption(option);
+        }
+
+        // 打开放松内容
+        function openRelaxContent(type) {
+            const title = {
+                'music': '舒缓音乐',
+                'meditation': '冥想指导',
+                'breathing': '呼吸练习',
+                'article': '治愈文章'
+            };
+            
+            document.getElementById('relaxTitle').textContent = title[type];
+            
+            const content = generateRelaxContent(type);
+            document.getElementById('relaxContent').innerHTML = content;
+            
+            showModal('relaxModal');
+        }
+
+        // 生成放松内容
+        function generateRelaxContent(type) {
+            const contents = {
+                music: `
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">🎵</div>
+                        <h4 class="text-lg font-semibold mb-4">舒缓音乐播放</h4>
+                        <div class="bg-gradient-to-r from-blue-100 to-purple-100 p-6 rounded-lg mb-4">
+                            <p class="text-gray-700 mb-4">正在播放：森林中的鸟鸣声</p>
+                            <div class="flex items-center justify-center space-x-4">
+                                <button class="bg-orange-500 text-white px-4 py-2 rounded-lg">⏮️</button>
+                                <button class="bg-orange-500 text-white px-6 py-3 rounded-lg text-xl">▶️</button>
+                                <button class="bg-orange-500 text-white px-4 py-2 rounded-lg">⏭️</button>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600">让自然的音乐带走你的烦恼，放松身心。</p>
+                    </div>
+                `,
+                meditation: `
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">🧘</div>
+                        <h4 class="text-lg font-semibold mb-4">5分钟冥想指导</h4>
+                        <div class="bg-gradient-to-r from-green-100 to-emerald-100 p-6 rounded-lg mb-4">
+                            <p class="text-gray-700 mb-4">找一个舒适的姿势，闭上眼睛</p>
+                            <div class="text-2xl font-bold text-green-600 mb-4" id="meditationTimer">5:00</div>
+                            <button onclick="startMeditation()" class="bg-orange-500 text-white px-6 py-3 rounded-lg">
+                                开始冥想
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600">专注于呼吸，让思绪慢慢平静下来。</p>
+                    </div>
+                `,
+                breathing: `
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">💨</div>
+                        <h4 class="text-lg font-semibold mb-4">4-7-8呼吸法</h4>
+                        <div class="bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-lg mb-4">
+                            <div class="text-6xl mb-4" id="breathingGuide">🫁</div>
+                            <p class="text-gray-700 mb-4" id="breathingInstruction">用鼻子吸气4秒</p>
+                            <button onclick="startBreathing()" class="bg-orange-500 text-white px-6 py-3 rounded-lg">
+                                开始练习
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600">这种呼吸法有助于缓解焦虑和压力。</p>
+                    </div>
+                `,
+                article: `
+                    <div>
+                        <div class="text-6xl mb-4 text-center">📖</div>
+                        <h4 class="text-lg font-semibold mb-4 text-center">治愈小文章</h4>
+                        <div class="bg-gradient-to-r from-yellow-100 to-orange-100 p-6 rounded-lg mb-4">
+                            <h5 class="font-semibold mb-3">《慢慢来，一切都会好的》</h5>
+                            <p class="text-gray-700 text-sm leading-relaxed mb-3">
+                                生活就像一杯茶，不会苦一辈子，但总会苦一阵子。当你觉得坚持不下去的时候，
+                                试着告诉自己：再坚持一下，就一下下。
+                            </p>
+                            <p class="text-gray-700 text-sm leading-relaxed mb-3">
+                                每个人都会有低谷期，这是成长必经的过程。就像春天的种子，
+                                需要在黑暗的土壤中坚持一段时间，才能破土而出，见到阳光。
+                            </p>
+                            <p class="text-gray-700 text-sm leading-relaxed">
+                                所以，请给自己多一些耐心，多一些温柔。你正在经历的，
+                                都是为了让你变得更加坚强和美好。
+                            </p>
+                        </div>
+                        <div class="text-center">
+                            <button class="bg-orange-500 text-white px-4 py-2 rounded-lg mr-2">👍 治愈</button>
+                            <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">📚 更多</button>
+                        </div>
+                    </div>
+                `
+            };
+            
+            return contents[type] || contents.article;
+        }
+
+        // 开始冥想
+        function startMeditation() {
+            let timeLeft = 300; // 5分钟
+            const timerElement = document.getElementById('meditationTimer');
+            
+            const timer = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                timeLeft--;
+                
+                if (timeLeft < 0) {
+                    clearInterval(timer);
+                    timerElement.textContent = '完成！';
+                    showToast('冥想完成，感觉如何？', 'success');
+                }
+            }, 1000);
+        }
+
+        // 开始呼吸练习
+        function startBreathing() {
+            const guide = document.getElementById('breathingGuide');
+            const instruction = document.getElementById('breathingInstruction');
+            
+            const phases = [
+                { text: '用鼻子吸气4秒', emoji: '🫁', duration: 4 },
+                { text: '屏住呼吸7秒', emoji: '😤', duration: 7 },
+                { text: '用嘴呼气8秒', emoji: '😮‍💨', duration: 8 }
+            ];
+            
+            let phaseIndex = 0;
+            let count = 0;
+            
+            const breathingTimer = setInterval(() => {
+                const phase = phases[phaseIndex];
+                guide.textContent = phase.emoji;
+                instruction.textContent = `${phase.text} (${phase.duration - count})`;
+                
+                count++;
+                
+                if (count >= phase.duration) {
+                    count = 0;
+                    phaseIndex = (phaseIndex + 1) % phases.length;
+                    
+                    if (phaseIndex === 0) {
+                        // 完成一轮
+                        showToast('完成一轮呼吸练习！', 'success');
+                    }
+                }
+            }, 1000);
+            
+            // 练习4轮后停止
+            setTimeout(() => {
+                clearInterval(breathingTimer);
+                guide.textContent = '🫁';
+                instruction.textContent = '练习完成！感受内心的平静';
+            }, 80000); // 约80秒完成4轮
+        }
+
+        // 显示快速情绪操作
+        function showQuickMoodActions() {
+            const actions = [
+                { name: '记录情绪', action: () => document.getElementById('moodNote').focus() },
+                { name: 'AI聊天', action: () => document.getElementById('moodChatInput').focus() },
+                { name: '放松内容', action: () => showToast('请选择下方的放松内容', 'info') }
+            ];
+            
+            const actionMenu = document.createElement('div');
+            actionMenu.className = 'fixed bottom-32 right-4 bg-white rounded-lg shadow-lg p-2 z-50';
+            actionMenu.innerHTML = actions.map(action => 
+                `<button onclick="this.parentElement.remove(); ${action.action.toString().replace('() => ', '')}" class="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded transition-colors">${action.name}</button>`
+            ).join('');
+            
+            document.body.appendChild(actionMenu);
+            
+            setTimeout(() => {
+                if (actionMenu.parentElement) {
+                    actionMenu.remove();
+                }
+            }, 3000);
+        }
+
+        // 显示模态框
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // 关闭模态框
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // 显示Toast提示
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm text-white ${
+                type === 'error' ? 'bg-red-500' : 
+                type === 'success' ? 'bg-green-500' : 
+                'bg-orange-500'
+            }`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            anime({
+                targets: toast,
+                translateX: [300, 0],
+                opacity: [0, 1],
+                duration: 300,
+                easing: 'easeOutQuad'
+            });
+            
+            setTimeout(() => {
+                anime({
+                    targets: toast,
+                    translateX: [0, 300],
+                    opacity: [1, 0],
+                    duration: 300,
+                    easing: 'easeInQuad',
+                    complete: () => {
+                        if (toast.parentElement) {
+                            toast.remove();
+                        }
+                    }
+                });
+            }, 3000);
+        }
+
+        // 回车键发送消息
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const moodChatInput = document.getElementById('moodChatInput');
+                if (document.activeElement === moodChatInput) {
+                    sendMoodMessage();
+                }
+            }
+            
+            // ESC键关闭模态框
+            if (e.key === 'Escape') {
+                const openModal = document.querySelector('.modal.show');
+                if (openModal) {
+                    closeModal(openModal.id);
+                }
+            }
+        });
+    </script>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功能介绍 - 悦养</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0FDF0 50%, #E8F5E8 100%);
+            min-height: 100vh;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #10B981, #F59E0B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .feature-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .feature-card.active {
+            border-color: #10B981;
+            background: linear-gradient(135deg, #E8F5E8, #F0FDF0);
+        }
+        .demo-area {
+            min-height: 400px;
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .plant-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+            background: linear-gradient(to bottom, #E8F5E8, #F0FDF0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            transition: all 0.3s ease;
+        }
+        .plant-container:hover {
+            transform: scale(1.05);
+        }
+        .achievement-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 0.25rem;
+            animation: bounce 0.5s ease-in-out;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .chat-bubble {
+            max-width: 80%;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 0.5rem 0;
+            position: relative;
+        }
+        .chat-bubble.user {
+            background: #10B981;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0.25rem;
+        }
+        .chat-bubble.ai {
+            background: #F3F4F6;
+            color: #374151;
+            margin-right: auto;
+            border-bottom-left-radius: 0.25rem;
+        }
+        .mood-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .mood-item {
+            text-align: center;
+            padding: 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .mood-item:hover {
+            border-color: #10B981;
+            background: #F0FDF0;
+        }
+        .mood-item.selected {
+            border-color: #10B981;
+            background: #DCFCE7;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold gradient-text" style="font-family: 'ZCOOL KuaiLe', cursive;">悦养</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors">首页</a>
+                        <a href="features.html" class="text-gray-900 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors">功能介绍</a>
+                        <a href="about.html" class="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors">关于我们</a>
+                        <button onclick="window.location.href='index.html#login'" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">登录</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="pt-16">
+        <!-- Hero区域 -->
+        <section class="py-20 bg-gradient-to-br from-green-50 to-emerald-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6" style="font-family: 'Noto Serif SC', serif;">
+                    体验<span class="gradient-text">悦养</span>的强大功能
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    轻养生模块 + 情绪陪伴模块，两大核心功能完美解决Z世代的养生焦虑与情绪内耗
+                </p>
+            </div>
+        </section>
+
+        <!-- 功能选择区域 -->
+        <section class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-2 gap-8 mb-12">
+                    <!-- 轻养生模块 -->
+                    <div class="feature-card bg-white p-8 rounded-2xl border-2 border-gray-200 active" onclick="showFeature('wellness')">
+                        <div class="text-center mb-6">
+                            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span class="text-4xl">🌱</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">轻养生模块</h3>
+                            <p class="text-gray-600">5分钟搞定"不费力的养生"</p>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center text-gray-700">
+                                <span class="text-green-500 mr-3">✓</span>
+                                碎片化养生任务推荐
+                            </div>
+                            <div class="flex items-center text-gray-700">
+                                <span class="text-green-500 mr-3">✓</span>
+                                个性化养生清单生成
+                            </div>
+                            <div class="flex items-center text-gray-700">
+                                <span class="text-green-500 mr-3">✓</span>
+                                养生互动小游戏化
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 情绪陪伴模块 -->
+                    <div class="feature-card bg-white p-8 rounded-2xl border-2 border-gray-200" onclick="showFeature('emotion')">
+                        <div class="text-center mb-6">
+                            <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span class="text-4xl">💝</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">情绪陪伴模块</h3>
+                            <p class="text-gray-600">做你的"线上情绪搭子"</p>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center text-gray-700">
+                                <span class="text-orange-500 mr-3">✓</span>
+                                AI情绪树洞（匿名化）
+                            </div>
+                            <div class="flex items-center text-gray-700">
+                                <span class="text-orange-500 mr-3">✓</span>
+                                同频陪伴圈（低压力社交）
+                            </div>
+                            <div class="flex items-center text-gray-700">
+                                <span class="text-orange-500 mr-3">✓</span>
+                                情绪充电站（场景化内容）
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 功能演示区域 -->
+                <div class="demo-area">
+                    <div id="wellnessDemo" class="feature-demo">
+                        <h3 class="text-2xl font-bold text-center text-gray-900 mb-6">轻养生功能演示</h3>
+                        
+                        <!-- 场景选择器 -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold mb-3">选择你的当前场景：</h4>
+                            <div class="grid grid-cols-3 gap-4">
+                                <button onclick="selectScenario('commute')" class="scenario-btn p-4 bg-gray-100 rounded-lg hover:bg-green-100 transition-colors">
+                                    <div class="text-2xl mb-2">🚗</div>
+                                    <div class="font-medium">通勤时光</div>
+                                </button>
+                                <button onclick="selectScenario('work')" class="scenario-btn p-4 bg-gray-100 rounded-lg hover:bg-green-100 transition-colors">
+                                    <div class="text-2xl mb-2">💼</div>
+                                    <div class="font-medium">加班时刻</div>
+                                </button>
+                                <button onclick="selectScenario('sleep')" class="scenario-btn p-4 bg-gray-100 rounded-lg hover:bg-green-100 transition-colors">
+                                    <div class="text-2xl mb-2">🌙</div>
+                                    <div class="font-medium">睡前放松</div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 推荐任务 -->
+                        <div id="taskRecommendation" class="mb-6 p-4 bg-green-50 rounded-lg" style="display: none;">
+                            <h4 class="font-semibold text-green-800 mb-2">为你推荐：</h4>
+                            <div id="recommendedTask" class="text-gray-700"></div>
+                            <button onclick="completeTask()" class="mt-3 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                                完成任务
+                            </button>
+                        </div>
+
+                        <!-- 植物养成游戏 -->
+                        <div class="text-center">
+                            <h4 class="text-lg font-semibold mb-4">你的养生小植物</h4>
+                            <div class="plant-container" id="plantContainer">
+                                🌱
+                            </div>
+                            <div class="mt-4">
+                                <div class="text-sm text-gray-600 mb-2">成长进度：<span id="plantProgress">0</span>/10</div>
+                                <div id="achievements" class="mb-4"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="emotionDemo" class="feature-demo" style="display: none;">
+                        <h3 class="text-2xl font-bold text-center text-gray-900 mb-6">情绪陪伴功能演示</h3>
+                        
+                        <!-- AI情绪树洞 -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold mb-3">AI情绪树洞</h4>
+                            <div class="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto mb-4" id="chatContainer">
+                                <div class="chat-bubble ai">
+                                    嗨！我是你的AI养生搭子，有什么想说的都可以告诉我哦～
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="userInput" placeholder="输入你的想法..." class="flex-1 p-3 border rounded-lg focus:outline-none focus:border-green-500">
+                                <button onclick="sendMessage()" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors">
+                                    发送
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 情绪充电站 -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold mb-3">情绪充电站</h4>
+                            <div class="mood-selector">
+                                <div class="mood-item" onclick="selectMood('happy')">
+                                    <div class="text-2xl mb-2">😊</div>
+                                    <div class="text-sm">心情愉悦</div>
+                                </div>
+                                <div class="mood-item" onclick="selectMood('tired')">
+                                    <div class="text-2xl mb-2">😴</div>
+                                    <div class="text-sm">有些疲惫</div>
+                                </div>
+                                <div class="mood-item" onclick="selectMood('stressed')">
+                                    <div class="text-2xl mb-2">😰</div>
+                                    <div class="text-sm">压力较大</div>
+                                </div>
+                                <div class="mood-item" onclick="selectMood('anxious')">
+                                    <div class="text-2xl mb-2">😟</div>
+                                    <div class="text-sm">感到焦虑</div>
+                                </div>
+                            </div>
+                            <div id="moodContent" class="mt-4 p-4 bg-orange-50 rounded-lg" style="display: none;">
+                                <h5 class="font-semibold text-orange-800 mb-2">为你推荐：</h5>
+                                <div id="moodRecommendation" class="text-gray-700"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 使用统计 -->
+        <section class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-900 mb-4">用户使用数据</h3>
+                    <p class="text-gray-600">看看悦养如何帮助Z世代改善生活质量</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-6 text-center">功能使用分布</h4>
+                        <div id="usageChart" style="height: 300px;"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-6 text-center">用户满意度</h4>
+                        <div id="satisfactionChart" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold gradient-text" style="font-family: 'ZCOOL KuaiLe', cursive;">悦养</h2>
+                <p class="text-gray-400 mt-2">Z世代轻养生情绪陪伴平台</p>
+            </div>
+            <div class="border-t border-gray-800 pt-6">
+                <p class="text-gray-400">&copy; 2024 悦养APP. 专为Z世代打造的养生新体验.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 全局变量
+        let plantProgress = 0;
+        let currentScenario = '';
+        let currentMood = '';
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            initializeAnimations();
+        });
+
+        // 功能切换
+        function showFeature(type) {
+            // 更新卡片状态
+            document.querySelectorAll('.feature-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.target.closest('.feature-card').classList.add('active');
+
+            // 切换演示区域
+            document.getElementById('wellnessDemo').style.display = type === 'wellness' ? 'block' : 'none';
+            document.getElementById('emotionDemo').style.display = type === 'emotion' ? 'block' : 'none';
+
+            // 添加切换动画
+            const activeDemo = document.querySelector('.feature-demo:not([style*="none"])');
+            if (activeDemo) {
+                anime({
+                    targets: activeDemo,
+                    opacity: [0, 1],
+                    translateY: [20, 0],
+                    duration: 500,
+                    easing: 'easeOutQuad'
+                });
+            }
+        }
+
+        // 选择场景
+        function selectScenario(scenario) {
+            currentScenario = scenario;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.classList.remove('bg-green-100', 'border-green-500');
+                btn.classList.add('bg-gray-100');
+            });
+            event.target.classList.remove('bg-gray-100');
+            event.target.classList.add('bg-green-100', 'border-green-500');
+
+            // 显示推荐任务
+            const recommendations = {
+                commute: {
+                    title: '通勤护颈操',
+                    description: '在地铁或公交车上，轻轻转动颈部，做前后左右的拉伸运动，每次保持5秒钟。'
+                },
+                work: {
+                    title: '眼部放松练习',
+                    description: '每工作1小时，远眺窗外20秒，然后闭眼休息1分钟，做眼部按摩。'
+                },
+                sleep: {
+                    title: '助眠呼吸法',
+                    description: '躺在床上，进行4-7-8呼吸法：吸气4秒，屏息7秒，呼气8秒，重复4次。'
+                }
+            };
+
+            const task = recommendations[scenario];
+            document.getElementById('recommendedTask').innerHTML = `
+                <h5 class="font-semibold text-green-800 mb-2">${task.title}</h5>
+                <p>${task.description}</p>
+            `;
+            
+            const taskRec = document.getElementById('taskRecommendation');
+            taskRec.style.display = 'block';
+            
+            // 动画效果
+            anime({
+                targets: taskRec,
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 500,
+                easing: 'easeOutQuad'
+            });
+        }
+
+        // 完成任务
+        function completeTask() {
+            plantProgress++;
+            document.getElementById('plantProgress').textContent = plantProgress;
+            
+            // 更新植物状态
+            const plantContainer = document.getElementById('plantContainer');
+            const plants = ['🌱', '🌿', '🪴', '🌳'];
+            const plantIndex = Math.min(Math.floor(plantProgress / 3), plants.length - 1);
+            plantContainer.textContent = plants[plantIndex];
+            
+            // 添加成就
+            if (plantProgress === 1) {
+                addAchievement('初次尝试');
+            } else if (plantProgress === 3) {
+                addAchievement('养生新手');
+            } else if (plantProgress === 5) {
+                addAchievement('养生达人');
+            } else if (plantProgress === 10) {
+                addAchievement('养生大师');
+            }
+            
+            // 动画效果
+            anime({
+                targets: plantContainer,
+                scale: [1, 1.2, 1],
+                duration: 600,
+                easing: 'easeOutElastic(1, .8)'
+            });
+            
+            // 隐藏任务推荐
+            document.getElementById('taskRecommendation').style.display = 'none';
+        }
+
+        // 添加成就
+        function addAchievement(name) {
+            const achievements = document.getElementById('achievements');
+            const badge = document.createElement('span');
+            badge.className = 'achievement-badge';
+            badge.textContent = `🏆 ${name}`;
+            achievements.appendChild(badge);
+            
+            // 动画效果
+            anime({
+                targets: badge,
+                scale: [0, 1],
+                duration: 500,
+                easing: 'easeOutBack'
+            });
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const chatContainer = document.getElementById('chatContainer');
+            
+            // 添加用户消息
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-bubble user';
+            userBubble.textContent = message;
+            chatContainer.appendChild(userBubble);
+            
+            // 清空输入框
+            input.value = '';
+            
+            // 模拟AI回复
+            setTimeout(() => {
+                const responses = [
+                    '我理解你的感受，要不要试试深呼吸放松一下？',
+                    '抱抱你！这种时候真的很需要被理解呢～',
+                    '听起来你真的很努力了，要不要给自己一个小奖励？',
+                    '这种感觉我也经历过，我们一起慢慢调整好吗？',
+                    '你已经很棒了！要不要听听舒缓的音乐放松一下？'
+                ];
+                
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                const aiBubble = document.createElement('div');
+                aiBubble.className = 'chat-bubble ai';
+                aiBubble.textContent = randomResponse;
+                chatContainer.appendChild(aiBubble);
+                
+                // 滚动到底部
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // 动画效果
+                anime({
+                    targets: [userBubble, aiBubble],
+                    opacity: [0, 1],
+                    translateY: [20, 0],
+                    duration: 500,
+                    easing: 'easeOutQuad'
+                });
+            }, 1000);
+            
+            // 滚动到底部
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // 选择情绪
+        function selectMood(mood) {
+            currentMood = mood;
+            
+            // 更新选择状态
+            document.querySelectorAll('.mood-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.target.closest('.mood-item').classList.add('selected');
+            
+            // 显示推荐内容
+            const recommendations = {
+                happy: {
+                    title: '保持好心情',
+                    content: '太棒了！建议记录今天的美好时刻，或者分享快乐给朋友们～'
+                },
+                tired: {
+                    title: '缓解疲劳',
+                    content: '疲惫的时候需要好好休息，建议听一些舒缓的音乐，或者小憩15分钟。'
+                },
+                stressed: {
+                    title: '减压放松',
+                    content: '压力大的时候试试深呼吸练习，或者做一些简单的拉伸运动。'
+                },
+                anxious: {
+                    title: '缓解焦虑',
+                    content: '焦虑时可以试试冥想，或者写下你的担忧，然后逐一解决。'
+                }
+            };
+            
+            const rec = recommendations[mood];
+            document.getElementById('moodRecommendation').innerHTML = `
+                <h6 class="font-semibold mb-2">${rec.title}</h6>
+                <p>${rec.content}</p>
+            `;
+            
+            const moodContent = document.getElementById('moodContent');
+            moodContent.style.display = 'block';
+            
+            // 动画效果
+            anime({
+                targets: moodContent,
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 500,
+                easing: 'easeOutQuad'
+            });
+        }
+
+        // 初始化图表
+        function initializeCharts() {
+            // 使用分布图表
+            const usageChart = echarts.init(document.getElementById('usageChart'));
+            const usageOption = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                series: [{
+                    name: '功能使用',
+                    type: 'pie',
+                    radius: '70%',
+                    data: [
+                        { value: 35, name: '轻养生任务' },
+                        { value: 25, name: '情绪记录' },
+                        { value: 20, name: 'AI陪伴' },
+                        { value: 15, name: '小游戏' },
+                        { value: 5, name: '其他' }
+                    ],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                    color: ['#10B981', '#F59E0B', '#8B5CF6', '#EF4444', '#6B7280']
+                }]
+            };
+            usageChart.setOption(usageOption);
+
+            // 满意度图表
+            const satisfactionChart = echarts.init(document.getElementById('satisfactionChart'));
+            const satisfactionOption = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['易用性', '功能性', '美观度', '实用性', '创新性']
+                },
+                yAxis: {
+                    type: 'value',
+                    max: 100
+                },
+                series: [{
+                    name: '满意度',
+                    type: 'bar',
+                    data: [92, 88, 95, 90, 87],
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: '#10B981' },
+                            { offset: 1, color: '#34D399' }
+                        ])
+                    }
+                }]
+            };
+            satisfactionChart.setOption(satisfactionOption);
+
+            // 响应式调整
+            window.addEventListener('resize', () => {
+                usageChart.resize();
+                satisfactionChart.resize();
+            });
+        }
+
+        // 初始化动画
+        function initializeAnimations() {
+            // 功能卡片动画
+            anime({
+                targets: '.feature-card',
+                translateY: [30, 0],
+                opacity: [0, 1],
+                duration: 800,
+                delay: anime.stagger(200),
+                easing: 'easeOutQuad'
+            });
+
+            // 演示区域动画
+            anime({
+                targets: '.demo-area',
+                scale: [0.95, 1],
+                opacity: [0, 1],
+                duration: 1000,
+                delay: 400,
+                easing: 'easeOutQuad'
+            });
+        }
+
+        // 回车键发送消息
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
