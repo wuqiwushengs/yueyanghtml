@@ -11,6 +11,18 @@
         if (justLoggedIn) {
             // 如果刚登录，清除标记并停留在当前页面
             localStorage.removeItem('justLoggedIn');
+        } else {
+            // 只在直接访问根目录或没有路径参数时重定向到about.html
+            const pathname = window.location.pathname;
+            // 检查是否是GitHub Pages部署环境且直接访问根目录
+            if (pathname === '/' || pathname.endsWith('/index.html')) {
+                // 检查是否有'view=index'参数
+                const urlParams = new URLSearchParams(window.location.search);
+                if (!urlParams.has('view')) {
+                    // 如果没有指定view参数，重定向到about.html
+                    window.location.href = 'about.html';
+                }
+            }
         }
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
