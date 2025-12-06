@@ -57,10 +57,13 @@ function checkUserAuthentication() {
         appData.user.name = currentUser.name || currentUser.username;
         appData.user.level = currentUser.level || 1;
         appData.user.joinDate = currentUser.joinDate || new Date().toISOString().split('T')[0];
-    } else if (!window.location.pathname.includes('login.html') && 
-               !window.location.pathname.includes('register.html')) {
-        // 如果没有登录且不在登录/注册页面，跳转到登录页面
-        window.location.href = 'login.html';
+    } else {
+        // 获取当前页面的文件名
+        const currentPage = window.location.href.split('/').pop();
+        if (currentPage !== 'login.html' && currentPage !== 'register.html') {
+            // 如果没有登录且不在登录/注册页面，跳转到登录页面
+            window.location.href = 'login.html';
+        }
     }
 }
 

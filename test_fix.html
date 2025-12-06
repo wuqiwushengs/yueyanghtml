@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录修复测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .output {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>登录修复测试</h1>
+    
+    <div class="test-section">
+        <h2>测试1: localStorage操作</h2>
+        <button onclick="testLocalStorage()">测试localStorage</button>
+        <div id="localStorageOutput" class="output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试2: 模拟登录流程</h2>
+        <button onclick="simulateLogin()">模拟登录</button>
+        <div id="loginOutput" class="output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试3: 检查用户认证状态</h2>
+        <button onclick="testAuthentication()">检查认证状态</button>
+        <div id="authOutput" class="output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试4: 清理测试数据</h2>
+        <button onclick="clearTestData()">清理数据</button>
+        <div id="clearOutput" class="output"></div>
+    </div>
+
+    <script>
+        // 输出函数
+        function output(id, message) {
+            const div = document.getElementById(id);
+            div.innerHTML += message + '<br>';
+        }
+        
+        // 清除输出
+        function clearOutput(id) {
+            document.getElementById(id).innerHTML = '';
+        }
+        
+        // 测试1: localStorage操作
+        function testLocalStorage() {
+            clearOutput('localStorageOutput');
+            output('localStorageOutput', '开始测试localStorage...');
+            
+            // 测试setItem
+            localStorage.setItem('testKey', 'testValue');
+            output('localStorageOutput', '保存测试数据: testKey = testValue');
+            
+            // 测试getItem
+            const value = localStorage.getItem('testKey');
+            output('localStorageOutput', '获取测试数据: ' + value);
+            
+            // 验证结果
+            if (value === 'testValue') {
+                output('localStorageOutput', '✅ localStorage测试成功');
+            } else {
+                output('localStorageOutput', '❌ localStorage测试失败');
+            }
+            
+            // 清理测试数据
+            localStorage.removeItem('testKey');
+        }
+        
+        // 测试2: 模拟登录流程
+        function simulateLogin() {
+            clearOutput('loginOutput');
+            output('loginOutput', '开始模拟登录...');
+            
+            // 模拟用户数据
+            const user = {
+                id: Date.now(),
+                username: 'testuser',
+                email: 'test@example.com',
+                name: '测试用户',
+                avatar: '👤',
+                joinDate: new Date().toISOString().split('T')[0],
+                level: 1
+            };
+            
+            output('loginOutput', '创建用户: ' + JSON.stringify(user, null, 2));
+            
+            // 保存用户数据到localStorage
+            const userData = {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                name: user.name,
+                avatar: user.avatar,
+                joinDate: user.joinDate,
+                level: user.level,
+                loginTime: new Date().toISOString()
+            };
+            
+            localStorage.setItem('yueyangCurrentUser', JSON.stringify(userData));
+            localStorage.setItem('justLoggedIn', 'true');
+            
+            output('loginOutput', '保存用户数据到localStorage');
+            
+            // 验证保存结果
+            const savedUser = localStorage.getItem('yueyangCurrentUser');
+            const justLoggedIn = localStorage.getItem('justLoggedIn');
+            
+            if (savedUser && justLoggedIn === 'true') {
+                output('loginOutput', '✅ 登录模拟成功');
+                output('loginOutput', '保存的用户数据: ' + JSON.stringify(JSON.parse(savedUser), null, 2));
+            } else {
+                output('loginOutput', '❌ 登录模拟失败');
+            }
+        }
+        
+        // 测试3: 检查用户认证状态
+        function testAuthentication() {
+            clearOutput('authOutput');
+            output('authOutput', '开始检查认证状态...');
+            
+            // 模拟checkUserAuthentication函数
+            const savedUser = localStorage.getItem('yueyangCurrentUser');
+            if (savedUser) {
+                const user = JSON.parse(savedUser);
+                output('authOutput', '✅ 已找到登录用户: ' + user.username);
+                output('authOutput', '用户信息: ' + JSON.stringify(user, null, 2));
+            } else {
+                output('authOutput', '❌ 未找到登录用户');
+            }
+            
+            // 模拟当前页面检查
+            const currentPage = window.location.href.split('/').pop();
+            output('authOutput', '当前页面: ' + currentPage);
+            
+            if (currentPage !== 'login.html' && currentPage !== 'register.html') {
+                if (!savedUser) {
+                    output('authOutput', '⚠️ 不在登录/注册页面且未登录，应跳转到登录页面');
+                } else {
+                    output('authOutput', '✅ 在非登录/注册页面且已登录，正常访问');
+                }
+            }
+        }
+        
+        // 测试4: 清理测试数据
+        function clearTestData() {
+            clearOutput('clearOutput');
+            output('clearOutput', '开始清理测试数据...');
+            
+            localStorage.removeItem('yueyangCurrentUser');
+            localStorage.removeItem('justLoggedIn');
+            localStorage.removeItem('testKey');
+            
+            output('clearOutput', '✅ 测试数据已清理');
+            output('clearOutput', '当前localStorage内容:');
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                output('clearOutput', '  ' + key + ': ' + value);
+            }
+        }
+        
+        // 页面加载时执行的初始化代码
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM加载完成，可以开始测试');
+        });
+    </script>
+</body>
+</html>

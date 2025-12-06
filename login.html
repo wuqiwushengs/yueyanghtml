@@ -257,6 +257,12 @@
             // 预填充演示账号
             document.getElementById('loginUsername').value = 'demo';
             document.getElementById('loginPassword').value = 'demo123';
+            
+            // 登录表单提交
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleLogin();
+            });
         }
 
         // 添加页面动画
@@ -278,17 +284,17 @@
             });
         }
 
-        // 登录表单提交
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            handleLogin();
-        });
+;
 
         // 处理登录
         function handleLogin() {
+            console.log('开始处理登录...');
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
             const rememberMe = document.getElementById('rememberMe').checked;
+
+            console.log('用户名:', username);
+            console.log('密码:', password);
 
             // 清除之前的错误信息
             clearErrors();
@@ -296,11 +302,13 @@
             // 验证输入
             if (!username) {
                 showError('usernameError', '请输入用户名或邮箱');
+                console.log('用户名不能为空');
                 return;
             }
 
             if (!password) {
                 showError('passwordError', '请输入密码');
+                console.log('密码不能为空');
                 return;
             }
 
@@ -316,12 +324,16 @@
                 level: 1
             };
 
+            console.log('创建的用户:', user);
+
             // 登录成功
             loginSuccess(user, rememberMe);
         }
 
         // 登录成功
         function loginSuccess(user, rememberMe) {
+            console.log('进入loginSuccess函数');
+            
             // 保存当前用户信息
             const userData = {
                 id: user.id,
@@ -334,9 +346,18 @@
                 loginTime: new Date().toISOString()
             };
 
+            console.log('准备保存用户数据:', userData);
             localStorage.setItem('yueyangCurrentUser', JSON.stringify(userData));
+            
+            // 验证是否保存成功
+            const savedUser = localStorage.getItem('yueyangCurrentUser');
+            console.log('保存后获取到的用户数据:', savedUser);
+            
             // 设置登录来源标记
             localStorage.setItem('justLoggedIn', 'true');
+            console.log('设置justLoggedIn标记');
+            
             // 跳转到index.html页面
+            console.log('准备跳转到index.html');
             window.location.href = 'index.html';
         }
