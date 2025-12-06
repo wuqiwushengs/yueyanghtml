@@ -246,8 +246,8 @@
             // 检查是否已有用户登录
             const currentUser = localStorage.getItem('yueyangCurrentUser');
             if (currentUser) {
-                // 如果已有用户登录，直接跳转到主页面
-                window.location.href = 'index.html';
+                // 如果已有用户登录，直接跳转到about页面
+                window.location.href = 'about.html';
                 return;
             }
 
@@ -335,8 +335,9 @@
             };
 
             localStorage.setItem('yueyangCurrentUser', JSON.stringify(userData));
-
-            // 跳转到about页面
-            window.location.href = 'about.html';
+            // 设置登录来源标记
+            localStorage.setItem('justLoggedIn', 'true');
+            // 跳转到index.html页面
+            window.location.href = 'index.html';
 
             // 如果选择了
