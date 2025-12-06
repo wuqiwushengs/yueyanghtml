@@ -48,23 +48,18 @@ document.addEventListener('DOMContentLoaded', function() {
     generateRecommendations();
 });
 
-// 检查用户认证状态
+// 检查用户认证状态 (已简化，不再强制跳转)
 function checkUserAuthentication() {
+    // 不再检查用户是否登录，允许所有页面自由访问
     const savedUser = localStorage.getItem('yueyangCurrentUser');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
-        // 更新appData中的用户信息
+        // 如果有用户数据，仍然更新appData
         appData.user.name = currentUser.name || currentUser.username;
         appData.user.level = currentUser.level || 1;
         appData.user.joinDate = currentUser.joinDate || new Date().toISOString().split('T')[0];
-    } else {
-        // 获取当前页面的文件名
-        const currentPage = window.location.href.split('/').pop();
-        if (currentPage !== 'login.html' && currentPage !== 'register.html') {
-            // 如果没有登录且不在登录/注册页面，跳转到登录页面
-            window.location.href = 'login.html';
-        }
     }
+    // 不再强制跳转到登录页面
 }
 
 // 加载应用数据
