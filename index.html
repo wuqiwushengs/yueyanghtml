@@ -4,15 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>悦养 - Z世代轻养生情绪陪伴平台</title>
-    <!-- 自动跳转到about.html -->
+    <!-- 检查登录状态 -->
     <script>
         // 检查是否刚登录
         const justLoggedIn = localStorage.getItem('justLoggedIn');
-        if (!justLoggedIn) {
-            // 如果不是刚登录，自动跳转到about.html
-            window.location.href = 'about.html';
-        } else {
-            // 如果刚登录，清除标记
+        if (justLoggedIn) {
+            // 如果刚登录，清除标记并停留在当前页面
             localStorage.removeItem('justLoggedIn');
         }
     </script>
