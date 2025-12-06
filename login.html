@@ -140,7 +140,7 @@
     <div class="login-card">
         <!-- Logo和标题 -->
         <div class="text-center mb-8">
-            <div class="text-6xl mb-4">🌱</div>
+            <div class="text-6xl mb-4">🧘‍♀️</div>
             <h1 class="text-3xl font-bold gradient-text mb-2" style="font-family: 'ZCOOL KuaiLe', cursive;">悦养</h1>
             <p class="text-gray-600">Z世代轻养生情绪陪伴平台</p>
         </div>
@@ -186,16 +186,16 @@
             </div>
 
             <div class="social-login">
-                <button type="button" class="social-btn" onclick="socialLogin('wechat')">
-                    <span class="text-2xl">💬</span>
-                </button>
-                <button type="button" class="social-btn" onclick="socialLogin('qq')">
-                    <span class="text-2xl">🐧</span>
-                </button>
-                <button type="button" class="social-btn" onclick="socialLogin('weibo')">
-                    <span class="text-2xl">📱</span>
-                </button>
-            </div>
+            <button type="button" class="social-btn" onclick="socialLogin('wechat')">
+                <span class="text-2xl">💚</span>
+            </button>
+            <button type="button" class="social-btn" onclick="socialLogin('qq')">
+                <span class="text-2xl">💙</span>
+            </button>
+            <button type="button" class="social-btn" onclick="socialLogin('weibo')">
+                <span class="text-2xl">❤️</span>
+            </button>
+        </div>
         </div>
 
         <!-- 注册链接 -->
@@ -304,20 +304,17 @@
                 return;
             }
 
-            if (password.length < 6) {
-                showError('passwordError', '密码长度至少6位');
-                return;
-            }
-
-            // 查找用户
-            const user = users.find(u => 
-                (u.username === username || u.email === username) && u.password === password
-            );
-
-            if (!user) {
-                showError('passwordError', '用户名或密码错误');
-                return;
-            }
+            // 创建模拟用户
+            const user = {
+                id: Date.now(),
+                username: username,
+                email: username.includes('@') ? username : username + '@example.com',
+                password: password,
+                name: '养生达人',
+                avatar: '👤',
+                joinDate: new Date().toISOString().split('T')[0],
+                level: 1
+            };
 
             // 登录成功
             loginSuccess(user, rememberMe);
@@ -338,5 +335,8 @@
             };
 
             localStorage.setItem('yueyangCurrentUser', JSON.stringify(userData));
+
+            // 跳转到about页面
+            window.location.href = 'about.html';
 
             // 如果选择了
