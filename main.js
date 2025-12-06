@@ -32,13 +32,37 @@ let appData = {
     }
 };
 
+// 当前登录用户
+let currentUser = null;
+
+// 用户数据库（模拟）
+let users = [];
+
 // 初始化应用
 document.addEventListener('DOMContentLoaded', function() {
+    checkUserAuthentication();
     loadAppData();
+    loadUsers();
     initializeApp();
     updateUI();
     generateRecommendations();
 });
+
+// 检查用户认证状态
+function checkUserAuthentication() {
+    const savedUser = localStorage.getItem('yueyangCurrentUser');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        // 更新appData中的用户信息
+        appData.user.name = currentUser.name || currentUser.username;
+        appData.user.level = currentUser.level || 1;
+        appData.user.joinDate = currentUser.joinDate || new Date().toISOString().split('T')[0];
+    } else if (!window.location.pathname.includes('login.html') && 
+               !window.location.pathname.includes('register.html')) {
+        // 如果没有登录且不在登录/注册页面，跳转到登录页面
+        window.location.href = 'login.html';
+    }
+}
 
 // 加载应用数据
 function loadAppData() {
@@ -51,6 +75,34 @@ function loadAppData() {
 // 保存应用数据
 function saveAppData() {
     localStorage.setItem('yueyangAppData', JSON.stringify(appData));
+}
+
+// 加载用户数据
+function loadUsers() {
+    const savedUsers = localStorage.getItem('yueyangUsers');
+    if (savedUsers) {
+        users = JSON.parse(savedUsers);
+    } else {
+        // 添加演示用户
+        users = [
+            {
+                id: 1,
+                username: 'demo',
+                email: 'demo@example.com',
+                password: 'demo123',
+                name: '养生达人',
+                avatar: '👤',
+                joinDate: new Date().toISOString().split('T')[0],
+                level: 1
+            }
+        ];
+        saveUsers();
+    }
+}
+
+// 保存用户数据
+function saveUsers() {
+    localStorage.setItem('yueyangUsers', JSON.stringify(users));
 }
 
 // 初始化应用
@@ -405,40 +457,10 @@ function saveMood() {
     }, 1000);
 }
 
-// 生成情绪响应
-function generateMoodResponse(mood, note) {
-    const responses = {
-        happy: [
-            '太棒了！保持这种好心情，今天一定会很顺利的！',
-            '开心的心情是最好的养生良药，记得多分享快乐哦～',
-            '看到你这么开心，我也很开心呢！继续保持这种积极的状态吧！'
-        ],
-        tired: [
-            '疲惫的时候要注意休息哦，身体是最重要的！',
-            '工作再忙也要照顾好自己，建议小憩15分钟恢复精力。',
-            '疲劳是身体在提醒你需要休息，听听舒缓的音乐怎么样？'
-        ],
-        stressed: [
-            '压力大的时候更要学会放松，试试5分钟的冥想吧～',
-            '我理解你的压力，记得要给自己一些喘息的空间哦。',
-            '压力是暂时的，相信你一定能够很好地处理！'
-        ],
-        anxious: [
-            '焦虑的时候试试写下来，把担忧都写在纸上会好很多。',
-            '深呼吸，一切都会好起来的。你很棒，要相信自己！',
-            '焦虑是暂时的，做一些喜欢的事情转移注意力吧～'
-        ]
-    };
-    
-    const moodResponses = responses[mood] || responses.happy;
-    return moodResponses[Math.floor(Math.random() * moodResponses.length)];
-}
-
 // 初始化聊天
 function initializeChat() {
     const chatContainer = document.getElementById('chatContainer');
-    if (chatContainer) {
-        // 添加欢迎消息
+    if (chatContainer && chatContainer.children.length <= 1) {
         const welcomeMessages = [
             '今天也要好好照顾自己哦～',
             '有什么烦恼都可以告诉我，我会认真听的！',
@@ -488,6 +510,35 @@ function addChatMessage(message, type) {
         duration: 500,
         easing: 'easeOutQuad'
     });
+}
+
+// 生成情绪响应
+function generateMoodResponse(mood, note) {
+    const responses = {
+        happy: [
+            '太棒了！保持这种好心情，今天一定会很顺利的！',
+            '开心的心情是最好的养生良药，记得多分享快乐哦～',
+            '看到你这么开心，我也很开心呢！继续保持这种积极的状态吧！'
+        ],
+        tired: [
+            '疲惫的时候要注意休息哦，身体是最重要的！',
+            '工作再忙也要照顾好自己，建议小憩15分钟恢复精力。',
+            '疲劳是身体在提醒你需要休息，听听舒缓的音乐怎么样？'
+        ],
+        stressed: [
+            '压力大的时候更要学会放松，试试5分钟的冥想吧～',
+            '我理解你的压力，记得要给自己一些喘息的空间哦。',
+            '压力是暂时的，相信你一定能够很好地处理！'
+        ],
+        anxious: [
+            '焦虑的时候试试写下来，把担忧都写在纸上会好很多。',
+            '深呼吸，一切都会好起来的。你很棒，要相信自己！',
+            '焦虑是暂时的，做一些喜欢的事情转移注意力吧～'
+        ]
+    };
+    
+    const moodResponses = responses[mood] || responses.happy;
+    return moodResponses[Math.floor(Math.random() * moodResponses.length)];
 }
 
 // 生成聊天响应
@@ -570,6 +621,18 @@ function generateRecommendations() {
     });
 }
 
+// 用户登出
+function logout() {
+    localStorage.removeItem('yueyangCurrentUser');
+    currentUser = null;
+    showToast('已退出登录', 'info');
+    
+    // 延迟跳转到登录页面
+    setTimeout(() => {
+        window.location.href = 'login.html';
+    }, 1000);
+}
+
 // 显示模态框
 function showModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -620,7 +683,7 @@ function showQuickActions() {
     const actions = [
         { name: '记录情绪', action: () => openMoodModal() },
         { name: '开始任务', action: () => openTaskModal() },
-        { name: '查看数据', action: () => showToast('数据查看功能开发中...', 'info') }
+        { name: '退出登录', action: () => logout() }
     ];
     
     const actionMenu = document.createElement('div');
