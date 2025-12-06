@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>养生任务 - 悦养</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #f8fafc;
+            padding-bottom: 80px;
+        }
+        .app-header {
+            background: linear-gradient(135deg, #10B981, #34D399);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 0.5rem 0;
+            z-index: 1000;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .nav-item.active {
+            color: #10B981;
+        }
+        .nav-item:hover {
+            color: #10B981;
+        }
+        .task-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        .task-card.completed {
+            background: linear-gradient(135deg, #f0fdf0, #dcfce7);
+            border: 2px solid #10B981;
+        }
+        .task-timer {
+            background: linear-gradient(135deg, #10B981, #34D399);
+            color: white;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #10B981, #34D399);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .category-tab {
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+        }
+        .category-tab.active {
+            background: #10B981;
+            color: white;
+        }
+        .category-tab:hover {
+            background: #dcfce7;
+            color: #10B981;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- 应用头部 -->
+    <header class="app-header">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <h1 class="text-xl font-bold" style="font-family: 'ZCOOL KuaiLe', cursive;">悦养</h1>
+                <span class="text-sm opacity-90">养生任务中心</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="text-sm" id="userGreeting">你好！</span>
+                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <span>👤</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="px-4 py-6 space-y-6">
+        <!-- 任务统计 -->
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="text-2xl font-bold text-green-600" id="totalTasks">0</div>
+                <div class="text-xs text-gray-600">总任务</div>
+            </div>
+            <div class="stat-item">
+                <div class="text-2xl font-bold text-orange-600" id="todayTasks">0</div>
+                <div class="text-xs text-gray-600">今日完成</div>
+            </div>
+            <div class="stat-item">
+                <div class="text-2xl font-bold text-purple-600" id="streakDays">0</div>
+                <div class="text-xs text-gray-600">连续天数</div>
+            </div>
+        </div>
+
+        <!-- 任务分类 -->
+        <div class="flex overflow-x-auto pb-2">
+            <div class="category-tab active" onclick="filterTasks('all')">全部</div>
+            <div class="category-tab" onclick="filterTasks('commute')">通勤</div>
+            <div class="category-tab" onclick="filterTasks('work')">工作</div>
+            <div class="category-tab" onclick="filterTasks('sleep')">睡前</div>
+            <div class="category-tab" onclick="filterTasks('completed')">已完成</div>
+        </div>
+
+        <!-- 任务列表 -->
+        <div id="taskList" class="space-y-4">
+            <!-- 动态生成任务列表 -->
+        </div>
+
+        <!-- 今日推荐 -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">今日推荐任务</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg">
+                    <div class="text-2xl mb-2">🌅</div>
+                    <h4 class="font-semibold text-gray-900 mb-1">晨间唤醒</h4>
+                    <p class="text-sm text-gray-600">5分钟晨间拉伸</p>
+                </div>
+                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-lg">
+                    <div class="text-2xl mb-2">💼</div>
+                    <h4 class="font-semibold text-gray-900 mb-1">工作间隙</h4>
+                    <p class="text-sm text-gray-600">眼部放松练习</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+        <div class="flex">
+            <a href="index.html" class="nav-item">
+                <div class="text-xl mb-1">🏠</div>
+                <div class="text-xs">首页</div>
+            </a>
+            <a href="tasks.html" class="nav-item active">
+                <div class="text-xl mb-1">🎯</div>
+                <div class="text-xs">任务</div>
+            </a>
+            <a href="mood.html" class="nav-item">
+                <div class="text-xl mb-1">💝</div>
+                <div class="text-xs">情绪</div>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="text-xl mb-1">👤</div>
+                <div class="text-xs">我的</div>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 任务执行模态框 -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-2" id="taskTitle">任务执行</h3>
+                <div class="task-timer" id="taskTimer">5:00</div>
+                <p class="text-gray-600" id="taskDescription">任务描述</p>
+            </div>
+            
+            <div class="progress-bar mb-6">
+                <div class="progress-fill" id="taskProgress" style="width: 0%"></div>
+            </div>
+            
+            <div class="text-center">
+                <button onclick="startTaskTimer()" id="startBtn" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 transition-colors">
+                    开始任务
+                </button>
+                <button onclick="completeTask()" id="completeBtn" class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 transition-colors" style="display: none;">
+                    完成任务
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 任务数据
+        const tasks = [
+            {
+                id: 1,
+                title: '颈部拉伸运动',
+                category: 'commute',
+                duration: 3,
+                description: '轻轻转动颈部，做前后左右的拉伸运动，缓解久坐疲劳',
+                steps: ['坐直身体，放松肩膀', '缓慢向左转动头部，保持5秒', '缓慢向右转动头部，保持5秒', '向前低头，保持5秒', '向后仰头，保持5秒']
+            },
+            {
+                id: 2,
+                title: '眼部放松练习',
+                category: 'commute',
+                duration: 2,
+                description: '远眺窗外，放松眼部肌肉，缓解眼部疲劳',
+                steps: ['闭上眼睛，休息30秒', '远眺窗外绿色植物30秒', '顺时针转动眼球5次', '逆时针转动眼球5次', '轻轻按摩眼周穴位']
+            },
+            {
+                id: 3,
+                title: '深呼吸调节',
+                category: 'commute',
+                duration: 5,
+                description: '4-7-8呼吸法，有效缓解压力和焦虑',
+                steps: ['坐直身体，放松肩膀', '用鼻子吸气4秒', '屏住呼吸7秒', '用嘴呼气8秒', '重复以上步骤3-4次']
+            },
+            {
+                id: 4,
+                title: '手腕保健操',
+                category: 'work',
+                duration: 2,
+                description: '活动手腕，预防鼠标手，改善手部血液循环',
+                steps: ['伸直手臂，手掌向上', '用另一只手轻轻向后拉伸手指', '换手重复动作', '转动手腕10次', '握拳放松10次']
+            },
+            {
+                id: 5,
+                title: '肩部放松运动',
+                category: 'work',
+                duration: 3,
+                description: '缓解肩部紧张，改善姿势，预防肩周炎',
+                steps: ['坐直身体，双肩向上耸起', '保持3秒后放松', '向后转动肩膀10次', '向前转动肩膀10次', '颈部左右拉伸各10秒']
+            },
+            {
+                id: 6,
+                title: '站立伸展',
+                category: 'work',
+                duration: 5,
+                description: '站起来活动，促进血液循环，缓解久坐疲劳',
+                steps: ['站起来，双脚与肩同宽', '双手举过头顶，向上拉伸', '左右侧弯各10秒', '向前弯腰，触摸脚尖', '原地踏步30秒']
+            },
+            {
+                id: 7,
+                title: '助眠呼吸法',
+                category: 'sleep',
+                duration: 5,
+                description: '深度放松，帮助入睡，改善睡眠质量',
+                steps: ['躺在床上，放松全身', '用鼻子缓慢吸气4秒', '屏住呼吸7秒', '用嘴缓慢呼气8秒', '重复4-6次']
+            },
+            {
+                id: 8,
+                title: '冥想放松',
+                category: 'sleep',
+                duration: 10,
+                description: '清空思绪，平静心灵，为优质睡眠做准备',
+                steps: ['找个舒适的姿势躺下', '闭上眼睛，深呼吸', '专注于呼吸节奏', '清空大脑中的杂念', '保持放松状态']
+            },
+            {
+                id: 9,
+                title: '轻柔拉伸',
+                category: 'sleep',
+                duration: 5,
+                description: '放松肌肉，改善睡眠质量，缓解身体紧张',
+                steps: ['躺在床上，双腿伸直', '双手举过头顶，全身拉伸', '抱膝至胸前，保持30秒', '双腿靠墙，保持2分钟', '全身放松，准备入睡']
+            }
+        ];
+
+        let currentTask = null;
+        let taskTimer = null;
+        let timeRemaining = 0;
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAppData();
+            renderTasks();
+            updateStats();
+        });
+
+        // 加载应用数据
+        function loadAppData() {
+            const savedData = localStorage.getItem('yueyangAppData');
+            if (savedData) {
+                window.appData = { ...window.appData, ...JSON.parse(savedData) };
+            }
+        }
+
+        // 保存应用数据
+        function saveAppData() {
+            localStorage.setItem('yueyangAppData', JSON.stringify(window.appData));
+        }
+
+        // 渲染任务列表
+        function renderTasks(filter = 'all') {
+            const taskListElement = document.getElementById('taskList');
+            if (!taskListElement) return;
+
+            taskListElement.innerHTML = '';
+            
+            const filteredTasks = tasks.filter(task => {
+                if (filter === 'all') return true;
+                if (filter === 'completed') {
+                    return window.appData.tasks.completed.some(completedTask => completedTask.id === task.id);
+                }
+                return task.category === filter;
+            });
+
+            filteredTasks.forEach(task => {
+                const isCompleted = window.appData.tasks.completed.some(completedTask => completedTask.id === task.id);
+                const taskElement = document.createElement('div');
+                taskElement.className = `task-card ${isCompleted ? 'completed' : ''}`;
+                taskElement.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <h3 class="text-lg font-semibold text-gray-900 mr-3">${task.title}</h3>
+                                <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                                    ${getCategoryName(task.category)}
+                                </span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">${task.description}</p>
+                            <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                <span>⏱️ ${task.duration}分钟</span>
+                                <span>📋 ${task.steps.length}个步骤</span>
+                                ${isCompleted ? '<span class="text-green-600">✅ 已完成</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            ${isCompleted ? 
+                                '<div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600">✓</span></div>' :
+                                `<button onclick="startTask(${task.id})" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                                    开始
+                                </button>`
+                            }
+                        </div>
+                    </div>
+                `;
+                taskListElement.appendChild(taskElement);
+            });
+
+            // 添加动画
+            anime({
+                targets: '.task-card',
+                translateY: [30, 0],
+                opacity: [0, 1],
+                duration: 600,
+                delay: anime.stagger(100),
+                easing: 'easeOutQuad'
+            });
+        }
+
+        // 获取分类名称
+        function getCategoryName(category) {
+            const names = {
+                'commute': '通勤',
+                'work': '工作',
+                'sleep': '睡前'
+            };
+            return names[category] || '其他';
+        }
+
+        // 筛选任务
+        function filterTasks(category) {
+            // 更新标签状态
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 渲染筛选后的任务
+            renderTasks(category);
+        }
+
+        // 开始任务
+        function startTask(taskId) {
+            currentTask = tasks.find(task => task.id === taskId);
+            if (!currentTask) return;
+
+            // 设置任务信息
+            document.getElementById('taskTitle').textContent = currentTask.title;
+            document.getElementById('taskDescription').textContent = currentTask.description;
+            document.getElementById('taskTimer').textContent = `${currentTask.duration}:00`;
+            document.getElementById('taskProgress').style.width = '0%';
+
+            // 显示模态框
+            showModal('taskModal');
+        }
+
+        // 开始任务计时
+        function startTaskTimer() {
+            const startBtn = document.getElementById('startBtn');
+            const completeBtn = document.getElementById('completeBtn');
+            
+            startBtn.style.display = 'none';
+            completeBtn.style.display = 'inline-block';
+
+            timeRemaining = currentTask.duration * 60; // 转换为秒
+            
+            taskTimer = setInterval(() => {
+                timeRemaining--;
+                
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                document.getElementById('taskTimer').textContent = 
+                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                const progress = ((currentTask.duration * 60 - timeRemaining) / (currentTask.duration * 60)) * 100;
+                document.getElementById('taskProgress').style.width = `${progress}%`;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(taskTimer);
+                    completeTask();
+                }
+            }, 1000);
+        }
+
+        // 完成任务
+        function completeTask() {
+            if (taskTimer) {
+                clearInterval(taskTimer);
+                taskTimer = null;
+            }
+
+            // 添加到已完成任务
+            if (!window.appData.tasks.completed.some(task => task.id === currentTask.id)) {
+                window.appData.tasks.completed.push({
+                    id: currentTask.id,
+                    title: currentTask.title,
+                    completedAt: new Date().toISOString()
+                });
+
+                window.appData.tasks.todayCount++;
+                window.appData.stats.totalTasks++;
+                
+                // 更新连续天数
+                updateStreak();
+                
+                // 植物成长
+                waterPlant();
+            }
+
+            showToast(`🎉 任务"${currentTask.title}"完成！获得成长值+1`, 'success');
+            
+            updateStats();
+            renderTasks();
+            closeModal('taskModal');
+            saveAppData();
+        }
+
+        // 更新连续天数
+        function updateStreak() {
+            const today = new Date().toDateString();
+            const lastTaskDate = window.appData.tasks.completed.length > 0 ? 
+                new Date(window.appData.tasks.completed[window.appData.tasks.completed.length - 1].completedAt).toDateString() : 
+                null;
+            
+            if (lastTaskDate === today) {
+                window.appData.tasks.streak = Math.max(window.appData.tasks.streak, 1);
+            } else {
+                window.appData.tasks.streak++;
+            }
+            
+            if (window.appData.tasks.streak > window.appData.stats.bestStreak) {
+                window.appData.stats.bestStreak = window.appData.tasks.streak;
+            }
+        }
+
+        // 植物成长（从主应用导入的功能）
+        function waterPlant() {
+            if (window.appData.plant.progress < 10) {
+                window.appData.plant.progress += 1;
+                
+                // 检查植物升级
+                checkPlantUpgrade();
+                
+                // 保存数据
+                saveAppData();
+            }
+        }
+
+        // 检查植物升级
+        function checkPlantUpgrade() {
+            const plants = [
+                { progress: 0, emoji: '🌱', name: '幼苗' },
+                { progress: 2, emoji: '🌿', name: '小苗' },
+                { progress: 4, emoji: '🪴', name: '盆栽' },
+                { progress: 6, emoji: '🌳', name: '小树' },
+                { progress: 8, emoji: '🌲', name: '大树' },
+                { progress: 10, emoji: '🌸', name: '开花' }
+            ];
+
+            const currentPlant = plants.find((plant, index) => {
+                const nextPlant = plants[index + 1];
+                return window.appData.plant.progress >= plant.progress && 
+                       (!nextPlant || window.appData.plant.progress < nextPlant.progress);
+            });
+
+            if (currentPlant && currentPlant.emoji !== window.appData.plant.emoji) {
+                window.appData.plant.emoji = currentPlant.emoji;
+                showToast(`🎉 植物升级了！变成了${currentPlant.name}`, 'success');
+                
+                // 添加成就
+                if (!window.appData.achievements.includes(`${currentPlant.name}养成`)) {
+                    window.appData.achievements.push(`${currentPlant.name}养成`);
+                }
+            }
+        }
+
+        // 更新统计数据
+        function updateStats() {
+            const totalTasksElement = document.getElementById('totalTasks');
+            const todayTasksElement = document.getElementById('todayTasks');
+            const streakDaysElement = document.getElementById('streakDays');
+
+            if (totalTasksElement) {
+                totalTasksElement.textContent = window.appData.stats.totalTasks;
+            }
+            if (todayTasksElement) {
+                todayTasksElement.textContent = window.appData.tasks.todayCount;
+            }
+            if (streakDaysElement) {
+                streakDaysElement.textContent = window.appData.tasks.streak;
+            }
+        }
+
+        // 显示模态框
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // 关闭模态框
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+                
+                // 重置计时器
+                if (taskTimer) {
+                    clearInterval(taskTimer);
+                    taskTimer = null;
+                }
+            }
+        }
+
+        // 显示Toast提示
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm text-white ${
+                type === 'error' ? 'bg-red-500' : 
+                type === 'success' ? 'bg-green-500' : 
+                'bg-blue-500'
+            }`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            anime({
+                targets: toast,
+                translateX: [300, 0],
+                opacity: [0, 1],
+                duration: 300,
+                easing: 'easeOutQuad'
+            });
+            
+            setTimeout(() => {
+                anime({
+                    targets: toast,
+                    translateX: [0, 300],
+                    opacity: [1, 0],
+                    duration: 300,
+                    easing: 'easeInQuad',
+                    complete: () => {
+                        if (toast.parentElement) {
+                            toast.remove();
+                        }
+                    }
+                });
+            }, 3000);
+        }
+    </script>
+    <script src="main.js"></script>
+</body>
+</html>

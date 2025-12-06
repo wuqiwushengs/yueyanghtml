@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>悦养 - Z世代轻养生情绪陪伴平台</title>
+    <script>
+        // 设置自动重定向到about.html作为主页面，但允许从网站内部访问index.html
+        // 检查是否有访问index的意图（通过URL参数或sessionStorage）
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasViewParam = urlParams.get('view') === 'index';
+        const hasSessionView = sessionStorage.getItem('viewIndex') === 'true';
+        const isDirectAccess = window.location.pathname === '/index.html' || window.location.pathname === '/';
+        
+        // 如果是直接访问index.html且没有访问意图标记，重定向到about.html
+        if (isDirectAccess && !hasViewParam && !hasSessionView) {
+            window.location.href = 'about.html';
+        }
+        
+        // 清除sessionStorage标记
+        sessionStorage.removeItem('viewIndex');
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
@@ -236,11 +252,14 @@
     <header class="app-header">
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <h1 class="text-xl font-bold" style="font-family: 'ZCOOL KuaiLe', cursive;">悦养</h1>
+                <h1 class="text-xl font-bold cursor-pointer hover:opacity-90 transition-opacity" 
+                    style="font-family: 'ZCOOL KuaiLe', cursive;" 
+                    onclick="window.location.href='about.html'">悦养</h1>
                 <span class="text-sm opacity-90">Z世代养生搭子</span>
             </div>
             <div class="flex items-center space-x-3">
                 <span class="text-sm" id="userGreeting">你好！</span>
+                <button onclick="window.location.href='login.html'" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full text-sm transition-colors">登录</button>
                 <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                     <span>👤</span>
                 </div>
@@ -352,7 +371,7 @@
     <!-- 底部导航 -->
     <nav class="bottom-nav">
         <div class="flex">
-            <a href="index.html" class="nav-item active">
+            <a href="index.html" onclick="sessionStorage.setItem('viewIndex', 'true')" class="nav-item active">
                 <div class="text-xl mb-1">🏠</div>
                 <div class="text-xs">首页</div>
             </a>

@@ -57,11 +57,8 @@ function checkUserAuthentication() {
         appData.user.name = currentUser.name || currentUser.username;
         appData.user.level = currentUser.level || 1;
         appData.user.joinDate = currentUser.joinDate || new Date().toISOString().split('T')[0];
-    } else if (!window.location.pathname.includes('login.html') && 
-               !window.location.pathname.includes('register.html')) {
-        // 如果没有登录且不在登录/注册页面，跳转到登录页面
-        window.location.href = 'login.html';
     }
+    // 不再强制跳转到登录页面，允许直接访问所有页面
 }
 
 // 加载应用数据
