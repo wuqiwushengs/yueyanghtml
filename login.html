@@ -140,7 +140,7 @@
     <div class="login-card">
         <!-- Logo和标题 -->
         <div class="text-center mb-8">
-            <div class="text-6xl mb-4">🧘‍♀️</div>
+            <div class="text-6xl mb-4">🌱</div>
             <h1 class="text-3xl font-bold gradient-text mb-2" style="font-family: 'ZCOOL KuaiLe', cursive;">悦养</h1>
             <p class="text-gray-600">Z世代轻养生情绪陪伴平台</p>
         </div>
@@ -186,16 +186,16 @@
             </div>
 
             <div class="social-login">
-            <button type="button" class="social-btn" onclick="socialLogin('wechat')">
-                <span class="text-2xl">💚</span>
-            </button>
-            <button type="button" class="social-btn" onclick="socialLogin('qq')">
-                <span class="text-2xl">💙</span>
-            </button>
-            <button type="button" class="social-btn" onclick="socialLogin('weibo')">
-                <span class="text-2xl">❤️</span>
-            </button>
-        </div>
+                <button type="button" class="social-btn" onclick="socialLogin('wechat')">
+                    <span class="text-2xl">💬</span>
+                </button>
+                <button type="button" class="social-btn" onclick="socialLogin('qq')">
+                    <span class="text-2xl">🐧</span>
+                </button>
+                <button type="button" class="social-btn" onclick="socialLogin('weibo')">
+                    <span class="text-2xl">📱</span>
+                </button>
+            </div>
         </div>
 
         <!-- 注册链接 -->
@@ -246,7 +246,7 @@
             // 检查是否已有用户登录
             const currentUser = localStorage.getItem('yueyangCurrentUser');
             if (currentUser) {
-                // 如果已有用户登录，直接跳转到index页面
+                // 如果已有用户登录，直接跳转到主页面
                 window.location.href = 'index.html';
                 return;
             }
@@ -257,12 +257,6 @@
             // 预填充演示账号
             document.getElementById('loginUsername').value = 'demo';
             document.getElementById('loginPassword').value = 'demo123';
-            
-            // 登录表单提交
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleLogin();
-            });
         }
 
         // 添加页面动画
@@ -284,31 +278,65 @@
             });
         }
 
+        // 登录表单提交
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleLogin();
+        });
+
         // 处理登录
         function handleLogin() {
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
+            const rememberMe = document.getElementById('rememberMe').checked;
 
             // 清除之前的错误信息
             clearErrors();
+
             // 验证输入
-            // if (!username) {
-            //     showError('usernameError', '请输入用户名或邮箱');
-            //     console.log('用户名不能为空');
-            //     return;
-            // }
+            if (!username) {
+                showError('usernameError', '请输入用户名或邮箱');
+                return;
+            }
 
-            // if (!password) {
-            //     showError('passwordError', '请输入密码');
-            //     console.log('密码不能为空');
-            //     return;
-            // }
+            if (!password) {
+                showError('passwordError', '请输入密码');
+                return;
+            }
 
-            // 直接跳转到index.html页面
-            console.log('登录成功，准备跳转到index.html');
-            window.location.replace('index.html');
+            if (password.length < 6) {
+                showError('passwordError', '密码长度至少6位');
+                return;
+            }
+
+            // 查找用户
+            const user = users.find(u => 
+                (u.username === username || u.email === username) && u.password === password
+            );
+
+            if (!user) {
+                showError('passwordError', '用户名或密码错误');
+                return;
+            }
+
+            // 登录成功
+            loginSuccess(user, rememberMe);
         }
 
-        // 登录成功函数已简化，直接在handleLogin中跳转
-    
-    
+        // 登录成功
+        function loginSuccess(user, rememberMe) {
+            // 保存当前用户信息
+            const userData = {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                name: user.name,
+                avatar: user.avatar,
+                joinDate: user.joinDate,
+                level: user.level,
+                loginTime: new Date().toISOString()
+            };
+
+            localStorage.setItem('yueyangCurrentUser', JSON.stringify(userData));
+
+            // 如果选择了
