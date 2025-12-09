@@ -807,3 +807,64 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// 背景动画样式
+const backgroundAnimationCSS = `
+/* 背景动画容器样式 */
+.background-animation-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* 粒子样式 */
+.background-particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(2px);
+}
+
+/* 添加脉冲效果 */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+.background-particle {
+    animation: pulse 3s infinite alternate;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .background-particle {
+        animation: pulse 4s infinite alternate;
+    }
+}
+`;
+
+// 动态添加CSS样式
+function addBackgroundAnimationCSS() {
+    const styleSheet = document.createElement('style');
+    styleSheet.type = 'text/css';
+    styleSheet.innerText = backgroundAnimationCSS;
+    document.head.appendChild(styleSheet);
+}
+
+// 页面加载完成后添加样式
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addBackgroundAnimationCSS);
+} else {
+    addBackgroundAnimationCSS();
+}

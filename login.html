@@ -339,4 +339,60 @@
 
             localStorage.setItem('yueyangCurrentUser', JSON.stringify(userData));
 
-            // 如果选择了
+            // 如果选择了记住我，保存用户信息
+            if (rememberMe) {
+                localStorage.setItem('yueyangRememberUser', JSON.stringify({
+                    username: user.username,
+                    password: user.password
+                }));
+            } else {
+                localStorage.removeItem('yueyangRememberUser');
+            }
+
+            // 显示成功消息并跳转
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = '登录成功，正在跳转...';
+            successMessage.style.display = 'block';
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+
+        // 显示忘记密码
+        function showForgotPassword() {
+            alert('忘记密码功能开发中...');
+        }
+
+        // 社交登录
+        function socialLogin(platform) {
+            alert(`${platform}登录功能开发中...`);
+        }
+
+        // 显示错误信息
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            const inputElement = errorElement.previousElementSibling;
+            if (inputElement) {
+                inputElement.classList.add('error');
+            }
+        }
+
+        // 清除错误信息
+        function clearErrors() {
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(error => {
+                error.textContent = '';
+                error.style.display = 'none';
+            });
+            const errorInputs = document.querySelectorAll('.form-input.error');
+            errorInputs.forEach(input => {
+                input.classList.remove('error');
+            });
+        }
+    </script>
+    <script src="background-animation.js"></script>
+</body>
+</html>

@@ -56,16 +56,160 @@
             color: #10B981;
         }
         .feature-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.85); /* 降低背景透明度 */
             border-radius: 1rem;
             padding: 1.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
             cursor: pointer;
+            backdrop-filter: blur(10px); /* 添加毛玻璃效果 */
+            animation: subtlePulse 4s infinite alternate;
         }
         .feature-card:hover {
+            transform: translateY(-2px) scale(1.02); /* 增强悬停效果 */
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.95); /* 悬停时增加透明度 */
+        }
+        
+        /* 微妙的脉动动画 */
+        @keyframes subtlePulse {
+            0% {
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                transform: translateY(0);
+            }
+            100% {
+                box-shadow: 0 8px 15px rgba(16, 185, 129, 0.15);
+                transform: translateY(-1px);
+            }
+        }
+        
+        /* 美化任务栏内的按钮 */
+        .feature-card button {
+            opacity: 1;
+            background-color: #10B981 !important; /* 设置明确的绿色背景，与任务栏背景形成对比 */
+            color: white;
+            backdrop-filter: blur(5px);
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 按钮悬停效果 */
+        .feature-card button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+            background-color: #059669 !important;
+        }
+        
+        /* 按钮点击效果 */
+        .feature-card button:active {
+            transform: translateY(0);
+        }
+        
+        /* 按钮渐变效果 */
+        .feature-card button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .feature-card button:hover::before {
+            left: 100%;
+        }
+        
+        .feature-card input,
+        .feature-card .stat-item,
+        .feature-card .chat-bubble,
+        .feature-card .chat-container {
+            opacity: 1;
+            background-color: inherit;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* 修改快速操作按钮的颜色和样式，使其更醒目 */
+        .feature-card button.bg-green-100 {
+            background-color: #10B981 !important;
+            color: white;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+        }
+        
+        .feature-card button.bg-orange-100 {
+            background-color: #F59E0B !important;
+            color: white;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+        }
+        
+        /* 为不同功能的按钮设置不同的颜色 */
+        .feature-card button.primary {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+        }
+        
+        .feature-card button.secondary {
+            background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%) !important;
+        }
+        
+        .feature-card button.warning {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+        }
+        
+        .feature-card button.danger {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
+        }
+        
+        /* 为任务栏添加小球映射容器 */
+        .feature-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0; /* 降低z-index，确保粒子在内容下方 */
+        }
+        
+        /* 确保任务栏内容在粒子上方 */
+        .feature-card > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card-particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        /* 增强统计项的动态效果 */
+        .stat-item {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+        }
+        
+        .stat-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            background: rgba(255, 255, 255, 1);
         }
         .task-item {
             background: white;
@@ -89,6 +233,52 @@
             font-size: 3rem;
             margin: 0 auto;
             position: relative;
+            animation: gentleFloat 6s ease-in-out infinite;
+        }
+        
+        #plantEmoji {
+            font-size: 60px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            transition: transform 0.5s ease;
+            filter: drop-shadow(0 4px 8px rgba(16, 185, 129, 0.3));
+        }
+        
+        /* 植物轻微浮动效果 */
+        @keyframes gentleFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        /* 增强快速操作按钮的效果 */
+        .feature-card button.bg-green-100,
+        .feature-card button.bg-orange-100 {
+            transition: all 0.3s ease;
+            background: rgba(220, 252, 231, 0.9);
+            backdrop-filter: blur(5px);
+        }
+        
+        .feature-card button.bg-orange-100 {
+            background: rgba(255, 237, 213, 0.9);
+        }
+        
+        .feature-card button.bg-green-100:hover,
+        .feature-card button.bg-orange-100:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* 模态框也添加毛玻璃效果 */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
         }
         .progress-ring {
             position: absolute;
@@ -117,10 +307,17 @@
             height: 300px;
             overflow-y: auto;
             padding: 1rem;
-            background: #f9fafb;
+            background: rgba(249, 250, 251, 0.9);
             border-radius: 0.75rem;
             margin-bottom: 1rem;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
         }
+        
+        .chat-container:hover {
+            background: rgba(249, 250, 251, 0.95);
+        }
+        
         .chat-bubble {
             max-width: 80%;
             padding: 0.75rem 1rem;
@@ -128,19 +325,47 @@
             margin: 0.5rem 0;
             position: relative;
             word-wrap: break-word;
+            transition: all 0.3s ease;
+            opacity: 1;
         }
+        
         .chat-bubble.user {
-            background: #10B981;
+            background: rgba(16, 185, 129, 0.9);
             color: white;
             margin-left: auto;
             border-bottom-right-radius: 0.25rem;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
+        
         .chat-bubble.ai {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             color: #374151;
             margin-right: auto;
             border-bottom-left-radius: 0.25rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 增强按钮的动态效果 */
+        .feature-card button {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* 增强输入框的效果 */
+        .feature-card input {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .feature-card input:focus {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
         }
         .mood-selector {
             display: grid;
@@ -452,5 +677,6 @@
     </div>
 
     <script src="main.js"></script>
+    <script src="background-animation.js"></script>
 </body>
 </html>

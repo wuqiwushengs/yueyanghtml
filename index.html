@@ -13,6 +13,8 @@
             font-family: 'Noto Sans SC', sans-serif;
             background: linear-gradient(135deg, #E8F5E8 0%, #F0FDF0 50%, #E8F5E8 100%);
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
         .gradient-text {
             background: linear-gradient(135deg, #10B981, #F59E0B);
@@ -24,10 +26,147 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        .team-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        .team-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .team-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .team-card:hover::before {
+            opacity: 1;
+        }
+        
+        .team-card h4 {
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .team-card:hover h4 {
+            color: #10B981;
+            transform: translateY(-5px);
+        }
+        /* 渐变按钮样式 */
+        .gradient-btn {
+            background: linear-gradient(135deg, #10B981, #34D399);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gradient-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .gradient-btn:hover::before {
+            left: 100%;
+        }
+        
+        /* 背景球体动画 */
+        body {
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .bg-sphere {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+            animation: float 6s ease-in-out infinite;
+            z-index: -1;
+        }
+        
+        .bg-sphere-1 {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: -5%;
+            animation-delay: 0s;
+        }
+        
+        .bg-sphere-2 {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            right: -5%;
+            animation-delay: 2s;
+        }
+        
+        .bg-sphere-3 {
+            width: 150px;
+            height: 150px;
+            bottom: 10%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-20px) scale(1.1);
+                opacity: 0.9;
+            }
+        }
+        
+        .value-card {
+            padding: 2rem;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #10B981, #34D399, #8B5CF6, #F59E0B);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .value-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .value-card:hover::before {
+            transform: scaleX(1);
+        }
+        
         .value-icon {
             width: 80px;
             height: 80px;
@@ -38,7 +177,26 @@
             justify-content: center;
             color: white;
             font-size: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
             margin: 0 auto 1rem;
+        }
+        
+        .value-card:hover .value-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* 滚动动画 */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .animate-on-scroll.animate {
+            opacity: 1;
+            transform: translateY(0);
         }
         .timeline-item {
             position: relative;
@@ -100,8 +258,12 @@
     </style>
 </head>
 <body>
-    <!-- 导航栏 -->
-    <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm">
+        <!-- 背景球体 -->
+        <div class="bg-sphere bg-sphere-1"></div>
+        <div class="bg-sphere bg-sphere-2"></div>
+        <div class="bg-sphere bg-sphere-3"></div>
+        <!-- 导航栏 -->
+        <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
@@ -112,7 +274,7 @@
                         <a href="dashboard.html" class="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors">首页</a>
                         <a href="features.html" class="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors">功能介绍</a>
                         <a href="index.html" class="text-gray-900 hover:text-green-600 px-3 py-2 text-sm font-medium transition-colors">关于我们</a>
-                        <button onclick="window.location.href='index.html#login'" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">登录</button>
+                        <button onclick="window.location.href='index.html#login'" class="gradient-btn bg-gradient-to-r from-green-500 to-teal-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300 font-medium">登录</button>
                     </div>
                 </div>
             </div>
@@ -142,21 +304,21 @@
                 </div>
                 
                 <div class="grid md:grid-cols-3 gap-8">
-                    <div class="text-center">
+                    <div class="text-center value-card animate-on-scroll">
                         <div class="value-icon">
                             🪶
                         </div>
                         <h4 class="text-xl font-bold mb-4">轻量化设计</h4>
                         <p class="text-gray-600">所有功能均适配Z世代碎片化时间特性，5分钟即可完成一次养生小任务或情绪疏导，无需专门腾出时间"打卡"</p>
                     </div>
-                    <div class="text-center">
+                    <div class="text-center value-card animate-on-scroll">
                         <div class="value-icon" style="background: linear-gradient(135deg, #F59E0B, #FBBF24);">
                             🎨
                         </div>
                         <h4 class="text-xl font-bold mb-4">年轻化表达</h4>
                         <p class="text-gray-600">拒绝"老干部式养生"，采用Z世代熟悉的语言体系（表情包、网络热词）与内容形式（短视频、互动小游戏）</p>
                     </div>
-                    <div class="text-center">
+                    <div class="text-center value-card animate-on-scroll">
                         <div class="value-icon" style="background: linear-gradient(135deg, #8B5CF6, #A78BFA);">
                             💝
                         </div>
@@ -583,10 +745,11 @@
         }, observerOptions);
 
         // 观察需要动画的元素
-        const animatedElements = document.querySelectorAll('.value-icon, .timeline-item');
+        const animatedElements = document.querySelectorAll('.value-card, .value-icon, .timeline-item');
         animatedElements.forEach(el => {
             observer.observe(el);
         });
     </script>
+    <script src="background-animation.js"></script>
 </body>
 </html>

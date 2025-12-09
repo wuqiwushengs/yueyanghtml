@@ -46,17 +46,46 @@
         .nav-item:hover {
             color: #F59E0B;
         }
-        .mood-card {
+        .mood-card,
+         .feature-card {
             background: white;
             border-radius: 1rem;
             padding: 1.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
         .mood-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 卡片粒子容器 */
+        .card-particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* 确保卡片内容在粒子上方 */
+        .mood-card > *,
+        .feature-card > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* 卡片粒子 */
+        .card-particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            pointer-events: none;
         }
         .mood-selector {
             display: grid;
@@ -962,5 +991,6 @@
         });
     </script>
     <script src="main.js"></script>
+    <script src="background-animation.js"></script>
 </body>
 </html>
