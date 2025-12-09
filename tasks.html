@@ -216,9 +216,48 @@
             <div class="category-tab" onclick="filterTasks('completed')">已完成</div>
         </div>
 
+        <!-- 正在进行的任务 -->
+        <div id="ongoingTask" class="bg-white rounded-2xl p-6 shadow-sm mb-6">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">正在进行的任务</h3>
+            <div id="noOngoingTask" class="text-center py-8">
+                <div class="text-4xl mb-4">⏳</div>
+                <p class="text-gray-600 mb-4">当前没有正在进行的任务</p>
+                <p class="text-sm text-gray-500">从下方选择一个任务开始吧</p>
+            </div>
+            <div id="activeTask" style="display: none;">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h4 id="activeTaskTitle" class="font-semibold text-gray-900"></h4>
+                        <p id="activeTaskCategory" class="text-xs text-gray-500"></p>
+                    </div>
+                    <div id="activeTaskTimer" class="task-timer"></div>
+                </div>
+                <div class="progress-bar mb-4">
+                    <div id="activeTaskProgress" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between">
+                    <button onclick="pauseTask()" id="pauseBtn" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors">
+                        暂停
+                    </button>
+                    <button onclick="resumeTask()" id="resumeBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors" style="display: none;">
+                        继续
+                    </button>
+                    <button onclick="completeTask()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                        完成
+                    </button>
+                    <button onclick="cancelTask()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- 任务列表 -->
-        <div id="taskList" class="space-y-4">
-            <!-- 动态生成任务列表 -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm mb-6">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">任务列表</h3>
+            <div id="taskList" class="space-y-4">
+                <!-- 动态生成任务列表 -->
+            </div>
         </div>
 
         <!-- 今日推荐 -->
@@ -253,6 +292,10 @@
             <a href="mood.html" class="nav-item">
                 <div class="text-xl mb-1">💝</div>
                 <div class="text-xs">情绪</div>
+            </a>
+            <a href="market.html" class="nav-item">
+                <div class="text-xl mb-1">🛒</div>
+                <div class="text-xs">市集</div>
             </a>
             <a href="profile.html" class="nav-item">
                 <div class="text-xl mb-1">👤</div>
@@ -359,12 +402,126 @@
                 duration: 5,
                 description: '放松肌肉，改善睡眠质量，缓解身体紧张',
                 steps: ['躺在床上，双腿伸直', '双手举过头顶，全身拉伸', '抱膝至胸前，保持30秒', '双腿靠墙，保持2分钟', '全身放松，准备入睡']
+            },
+            // 今日推荐任务转换为可执行任务
+            {
+                id: 10,
+                title: '晨间唤醒',
+                category: 'commute',
+                duration: 5,
+                description: '5分钟晨间拉伸，唤醒身体活力',
+                steps: ['坐直身体，深呼吸3次', '手臂向上伸展，保持5秒', '向前弯腰，触摸脚尖', '左右侧弯拉伸', '原地踏步30秒']
+            },
+            {
+                id: 11,
+                title: '工作间隙',
+                category: 'work',
+                duration: 3,
+                description: '眼部放松练习，缓解视觉疲劳',
+                steps: ['闭上眼睛，轻轻按压眼球', '顺时针转动眼球10次', '逆时针转动眼球10次', '远眺窗外1分钟', '轻轻按摩眼周']
+            },
+            // 新增10个任务
+            {
+                id: 12,
+                title: '腿部放松运动',
+                category: 'commute',
+                duration: 4,
+                description: '活动腿部肌肉，促进血液循环',
+                steps: ['坐直身体，双脚平放在地面', '抬起左腿，伸直膝盖', '顺时针转动脚踝10次', '逆时针转动脚踝10次', '放下左腿，换右腿重复']
+            },
+            {
+                id: 13,
+                title: '坐姿矫正训练',
+                category: 'work',
+                duration: 5,
+                description: '改善坐姿，预防脊柱侧弯',
+                steps: ['坐直身体，双脚与肩同宽', '收紧腹部肌肉', '双肩向后展开', '保持正确姿势5分钟', '定期提醒自己保持坐姿']
+            },
+            {
+                id: 14,
+                title: '手指灵活性训练',
+                category: 'work',
+                duration: 2,
+                description: '活动手指关节，提高灵活性',
+                steps: ['用力握拳，保持3秒', '完全伸展手指，保持3秒', '依次弯曲每个手指', '用手指敲击桌面', '双手交叉，互相按压手掌']
+            },
+            {
+                id: 15,
+                title: '腰部扭转运动',
+                category: 'work',
+                duration: 3,
+                description: '缓解腰部紧张，改善腰部柔韧性',
+                steps: ['坐直身体，双脚平放在地面', '双手放在身体两侧', '缓慢向左扭转腰部', '保持5秒，然后向右扭转', '重复5次']
+            },
+            {
+                id: 16,
+                title: '耳部按摩',
+                category: 'commute',
+                duration: 2,
+                description: '按摩耳部穴位，缓解压力',
+                steps: ['用拇指和食指捏揉耳尖', '沿着耳轮廓从上到下按摩', '轻轻拉扯耳垂', '按压耳屏前方穴位', '用手掌轻轻拍打双耳']
+            },
+            {
+                id: 17,
+                title: '足部放松',
+                category: 'sleep',
+                duration: 5,
+                description: '按摩足部，缓解一天的疲劳',
+                steps: ['用热水泡脚5-10分钟', '用拇指按压脚掌', '按摩脚趾关节', '用手掌摩擦足部', '轻轻拉扯脚趾']
+            },
+            {
+                id: 18,
+                title: '背部伸展',
+                category: 'work',
+                duration: 3,
+                description: '伸展背部肌肉，缓解背部酸痛',
+                steps: ['坐直身体，双手交叉放在背后', '轻轻向前弯腰', '保持5秒，然后向后仰', '左右侧弯拉伸背部', '重复5次']
+            },
+            {
+                id: 19,
+                title: '口腔运动',
+                category: 'commute',
+                duration: 2,
+                description: '活动口腔肌肉，促进面部血液循环',
+                steps: ['用力咬牙，保持3秒', '完全放松牙齿', '用力皱起眉头，然后放松', '鼓起腮帮子，保持3秒', '轻轻按摩脸部肌肉']
+            },
+            {
+                id: 20,
+                title: '睡前冥想',
+                category: 'sleep',
+                duration: 10,
+                description: '冥想放松，帮助快速入睡',
+                steps: ['躺在床上，保持舒适姿势', '闭上眼睛，深呼吸', '专注于呼吸节奏', '排除杂念，保持平静', '慢慢进入睡眠状态']
+            },
+            {
+                id: 21,
+                title: '手臂力量训练',
+                category: 'commute',
+                duration: 4,
+                description: '简单的手臂训练，增强手臂力量',
+                steps: ['双手交叉，互相用力按压', '弯曲手肘，做虚拟俯卧撑', '伸直手臂，上下摆动', '旋转手臂，顺时针和逆时针', '用力握拳，然后放松']
             }
         ];
 
         let currentTask = null;
         let taskTimer = null;
         let timeRemaining = 0;
+
+        // 确保appData已初始化
+        if (!window.appData) {
+            window.appData = {
+                tasks: {
+                    completed: [],
+                    todayCount: 0,
+                    streak: 0
+                },
+                stats: {
+                    totalTasks: 0,
+                    totalMoodRecords: 0,
+                    bestStreak: 0
+                }
+            };
+        }
 
         // 初始化页面
         document.addEventListener('DOMContentLoaded', function() {
@@ -421,12 +578,17 @@
                                 ${isCompleted ? '<span class="text-green-600">✅ 已完成</span>' : ''}
                             </div>
                         </div>
-                        <div class="ml-4">
+                        <div class="ml-4 space-y-2">
                             ${isCompleted ? 
                                 '<div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"><span class="text-green-600">✓</span></div>' :
-                                `<button onclick="startTask(${task.id})" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                                `
+                                <button onclick="startTask(${task.id})" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors w-full">
                                     开始
-                                </button>`
+                                </button>
+                                <button onclick="addToOngoing(${task.id})" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors w-full">
+                                    添加到执行
+                                </button>
+                                `
                             }
                         </div>
                     </div>
@@ -492,6 +654,9 @@
 
             timeRemaining = currentTask.duration * 60; // 转换为秒
             
+            // 更新正在进行的任务区域
+            updateOngoingTaskDisplay();
+            
             taskTimer = setInterval(() => {
                 timeRemaining--;
                 
@@ -500,14 +665,135 @@
                 document.getElementById('taskTimer').textContent = 
                     `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
+                // 更新模态框进度
                 const progress = ((currentTask.duration * 60 - timeRemaining) / (currentTask.duration * 60)) * 100;
                 document.getElementById('taskProgress').style.width = `${progress}%`;
+                
+                // 更新正在进行的任务区域进度
+                document.getElementById('activeTaskTimer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                document.getElementById('activeTaskProgress').style.width = `${progress}%`;
 
                 if (timeRemaining <= 0) {
                     clearInterval(taskTimer);
                     completeTask();
                 }
             }, 1000);
+        }
+        
+        // 暂停任务
+        function pauseTask() {
+            if (taskTimer) {
+                clearInterval(taskTimer);
+                taskTimer = null;
+                
+                // 更新按钮状态
+                document.getElementById('pauseBtn').style.display = 'none';
+                document.getElementById('resumeBtn').style.display = 'inline-block';
+                
+                showToast('⏸️ 任务已暂停', 'info');
+            }
+        }
+        
+        // 继续任务
+        function resumeTask() {
+            if (!taskTimer && currentTask) {
+                taskTimer = setInterval(() => {
+                    timeRemaining--;
+                    
+                    const minutes = Math.floor(timeRemaining / 60);
+                    const seconds = timeRemaining % 60;
+                    document.getElementById('taskTimer').textContent = 
+                        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    // 更新模态框进度
+                    const progress = ((currentTask.duration * 60 - timeRemaining) / (currentTask.duration * 60)) * 100;
+                    document.getElementById('taskProgress').style.width = `${progress}%`;
+                    
+                    // 更新正在进行的任务区域进度
+                    document.getElementById('activeTaskTimer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    document.getElementById('activeTaskProgress').style.width = `${progress}%`;
+
+                    if (timeRemaining <= 0) {
+                        clearInterval(taskTimer);
+                        completeTask();
+                    }
+                }, 1000);
+                
+                // 更新按钮状态
+                document.getElementById('pauseBtn').style.display = 'inline-block';
+                document.getElementById('resumeBtn').style.display = 'none';
+                
+                showToast('▶️ 任务已继续', 'info');
+            }
+        }
+        
+        // 取消任务
+        function cancelTask() {
+            if (taskTimer) {
+                clearInterval(taskTimer);
+                taskTimer = null;
+            }
+            
+            currentTask = null;
+            timeRemaining = 0;
+            
+            // 重置按钮状态
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+            document.getElementById('resumeBtn').style.display = 'none';
+            
+            // 隐藏正在进行的任务
+            hideOngoingTask();
+            
+            closeModal('taskModal');
+            showToast('❌ 任务已取消', 'warning');
+        }
+        
+        // 添加任务到执行
+        function addToOngoing(taskId) {
+            // 如果已经有正在进行的任务，先取消当前任务
+            if (currentTask) {
+                cancelTask();
+            }
+            
+            // 获取要添加的任务
+            currentTask = tasks.find(task => task.id === taskId);
+            if (!currentTask) return;
+            
+            // 设置初始时间
+            timeRemaining = currentTask.duration * 60;
+            
+            // 更新正在进行的任务显示
+            updateOngoingTaskDisplay();
+            
+            // 显示提示信息
+            showToast(`✅ 任务"${currentTask.title}"已添加到执行`);
+        }
+        
+        // 更新正在进行的任务显示
+        function updateOngoingTaskDisplay() {
+            if (currentTask) {
+                document.getElementById('noOngoingTask').style.display = 'none';
+                document.getElementById('activeTask').style.display = 'block';
+                
+                document.getElementById('activeTaskTitle').textContent = currentTask.title;
+                document.getElementById('activeTaskCategory').textContent = `分类: ${getCategoryName(currentTask.category)}`;
+                
+                // 计算时间显示
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                document.getElementById('activeTaskTimer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                // 计算进度
+                const totalTime = currentTask.duration * 60;
+                const progress = ((totalTime - timeRemaining) / totalTime) * 100;
+                document.getElementById('activeTaskProgress').style.width = `${progress}%`;
+            }
+        }
+        
+        // 隐藏正在进行的任务
+        function hideOngoingTask() {
+            document.getElementById('noOngoingTask').style.display = 'block';
+            document.getElementById('activeTask').style.display = 'none';
         }
 
         // 完成任务
@@ -537,10 +823,17 @@
 
             showToast(`🎉 任务"${currentTask.title}"完成！获得成长值+1`, 'success');
             
+            // 隐藏正在进行的任务
+            hideOngoingTask();
+            
             updateStats();
             renderTasks();
             closeModal('taskModal');
             saveAppData();
+            
+            // 重置当前任务
+            currentTask = null;
+            timeRemaining = 0;
         }
 
         // 更新连续天数
@@ -617,6 +910,48 @@
             if (streakDaysElement) {
                 streakDaysElement.textContent = window.appData.tasks.streak;
             }
+        }
+        
+        // 显示提示信息
+        function showToast(message) {
+            // 创建提示元素
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            
+            // 添加样式
+            toast.style.position = 'fixed';
+            toast.style.bottom = '100px';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.backgroundColor = '#10B981';
+            toast.style.color = 'white';
+            toast.style.padding = '12px 24px';
+            toast.style.borderRadius = '8px';
+            toast.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+            toast.style.zIndex = '10000';
+            toast.style.animation = 'fadeInOut 2s ease-in-out';
+            
+            // 添加动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInOut {
+                    0% { opacity: 0; transform: translate(-50%, 20px); }
+                    20% { opacity: 1; transform: translate(-50%, 0); }
+                    80% { opacity: 1; transform: translate(-50%, 0); }
+                    100% { opacity: 0; transform: translate(-50%, 20px); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // 添加到页面
+            document.body.appendChild(toast);
+            
+            // 2秒后移除
+            setTimeout(() => {
+                toast.remove();
+                style.remove();
+            }, 2000);
         }
 
         // 显示模态框

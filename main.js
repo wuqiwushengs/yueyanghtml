@@ -124,8 +124,60 @@ function initializeApp() {
     // 初始化聊天
     initializeChat();
 
+    // 渲染dashboard任务列表
+    renderDashboardTasks();
+
     // 添加页面动画
     addPageAnimations();
+}
+
+// 渲染Dashboard任务列表
+function renderDashboardTasks() {
+    const taskListElement = document.getElementById('dashboardTaskList');
+    if (!taskListElement) return;
+
+    // 今日推荐任务
+    const todayTasks = [
+        { id: 1, title: '颈部拉伸运动', duration: '3分钟', desc: '轻轻转动颈部，缓解久坐疲劳', category: 'commute' },
+        { id: 2, title: '眼部放松练习', duration: '2分钟', desc: '远眺窗外，放松眼部肌肉', category: 'work' },
+        { id: 3, title: '深呼吸调节', duration: '5分钟', desc: '4-7-8呼吸法，缓解压力', category: 'sleep' },
+        { id: 4, title: '手腕保健操', duration: '2分钟', desc: '活动手腕，预防鼠标手', category: 'work' },
+        { id: 5, title: '肩部放松运动', duration: '3分钟', desc: '缓解肩部紧张，改善姿势', category: 'work' }
+    ];
+
+    taskListElement.innerHTML = '';
+    todayTasks.forEach(task => {
+        const taskElement = document.createElement('div');
+        taskElement.className = 'task-item';
+        taskElement.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div>
+                    <h4 class="font-semibold text-gray-900">${task.title}</h4>
+                    <p class="text-sm text-gray-600">${task.desc}</p>
+                    <div class="flex items-center mt-1">
+                        <span class="text-xs text-green-600 mr-2">⏱️ ${task.duration}</span>
+                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                            ${task.category === 'commute' ? '通勤' : task.category === 'work' ? '工作' : '睡前'}
+                        </span>
+                    </div>
+                </div>
+                <button onclick="startTask(${task.id}, '${task.title}')" class="bg-green-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-green-600 transition-colors">
+                    开始
+                </button>
+            </div>
+        `;
+        taskListElement.appendChild(taskElement);
+    });
+
+    // 添加动画效果
+    anime({
+        targets: '.task-item',
+        opacity: [0, 1],
+        translateY: [20, 0],
+        duration: 600,
+        delay: anime.stagger(100),
+        easing: 'easeOutQuad'
+    });
 }
 
 // 更新UI

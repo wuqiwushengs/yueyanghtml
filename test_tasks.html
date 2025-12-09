@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务列表测试</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Noto Sans SC', sans-serif; background: #f8fafc; padding: 2rem; }
+        .task-card { background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <h1 class="text-2xl font-bold mb-4">任务列表测试</h1>
+    <div id="taskList" class="space-y-4">
+        <!-- 动态生成任务列表 -->
+    </div>
+
+    <script>
+        // 简化的任务数据
+        const tasks = [
+            {
+                id: 1,
+                title: '颈部拉伸运动',
+                category: 'commute',
+                duration: 3,
+                description: '轻轻转动颈部，做前后左右的拉伸运动，缓解久坐疲劳',
+                steps: ['坐直身体，放松肩膀', '缓慢向左转动头部，保持5秒', '缓慢向右转动头部，保持5秒', '向前低头，保持5秒', '向后仰头，保持5秒']
+            },
+            {
+                id: 2,
+                title: '眼部放松练习',
+                category: 'commute',
+                duration: 2,
+                description: '远眺窗外，放松眼部肌肉，缓解眼部疲劳',
+                steps: ['闭上眼睛，休息30秒', '远眺窗外绿色植物30秒', '顺时针转动眼球5次', '逆时针转动眼球5次', '轻轻按摩眼周穴位']
+            },
+            {
+                id: 3,
+                title: '深呼吸调节',
+                category: 'commute',
+                duration: 5,
+                description: '4-7-8呼吸法，有效缓解压力和焦虑',
+                steps: ['坐直身体，放松肩膀', '用鼻子吸气4秒', '屏住呼吸7秒', '用嘴呼气8秒', '重复以上步骤3-4次']
+            }
+        ];
+
+        // 简化的appData
+        window.appData = {
+            tasks: {
+                completed: [],
+                todayCount: 0,
+                streak: 0
+            },
+            stats: {
+                totalTasks: 0,
+                totalMoodRecords: 0,
+                bestStreak: 0
+            }
+        };
+
+        // 获取分类名称
+        function getCategoryName(category) {
+            const names = {
+                'commute': '通勤',
+                'work': '工作',
+                'sleep': '睡前'
+            };
+            return names[category] || '其他';
+        }
+
+        // 渲染任务列表
+        function renderTasks(filter = 'all') {
+            console.log('渲染任务列表，筛选条件:', filter);
+            const taskListElement = document.getElementById('taskList');
+            if (!taskListElement) {
+                console.error('未找到taskList元素');
+                return;
+            }
+            console.log('找到taskList元素:', taskListElement);
+
+            taskListElement.innerHTML = '';
+            
+            const filteredTasks = tasks.filter(task => {
+                if (filter === 'all') return true;
+                if (filter === 'completed') {
+                    return window.appData.tasks.completed.some(completedTask => completedTask.id === task.id);
+                }
+                return task.category === filter;
+            });
+            console.log('筛选后的任务:', filteredTasks);
+
+            filteredTasks.forEach(task => {
+                const isCompleted = window.appData.tasks.completed.some(completedTask => completedTask.id === task.id);
+                const taskElement = document.createElement('div');
+                taskElement.className = `task-card ${isCompleted ? 'completed' : ''}`;
+                taskElement.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <h3 class="text-lg font-semibold text-gray-900 mr-3">${task.title}</h3>
+                                <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                                    ${getCategoryName(task.category)}
+                                </span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">${task.description}</p>
+                            <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                <span>⏱️ ${task.duration}分钟</span>
+                                <span>📋 ${task.steps.length}个步骤</span>
+                                ${isCompleted ? '<span class="text-green-600">✅ 已完成</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                taskListElement.appendChild(taskElement);
+                console.log('已添加任务卡片:', task.title);
+            });
+
+            console.log('任务卡片已添加到页面');
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM已加载');
+            console.log('appData:', window.appData);
+            console.log('任务数据:', tasks);
+            renderTasks();
+        });
+    </script>
+</body>
+</html>

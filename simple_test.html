@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单任务列表测试</title>
+</head>
+<body>
+    <h1>简单任务列表测试</h1>
+    <div id="taskList">
+        <!-- 任务列表将在这里显示 -->
+    </div>
+
+    <script>
+        // 任务数据
+        const tasks = [
+            {
+                id: 1,
+                title: '颈部拉伸运动',
+                category: 'commute',
+                duration: 3,
+                description: '轻轻转动颈部，做前后左右的拉伸运动，缓解久坐疲劳'
+            },
+            {
+                id: 2,
+                title: '眼部放松练习',
+                category: 'commute',
+                duration: 2,
+                description: '远眺窗外，放松眼部肌肉，缓解眼部疲劳'
+            },
+            {
+                id: 3,
+                title: '深呼吸调节',
+                category: 'commute',
+                duration: 5,
+                description: '4-7-8呼吸法，有效缓解压力和焦虑'
+            }
+        ];
+
+        // 获取分类名称
+        function getCategoryName(category) {
+            const names = {
+                'commute': '通勤',
+                'work': '工作',
+                'sleep': '睡前'
+            };
+            return names[category] || '其他';
+        }
+
+        // 渲染任务列表
+        function renderTasks() {
+            console.log('开始渲染任务列表');
+            const taskListElement = document.getElementById('taskList');
+            if (!taskListElement) {
+                console.error('未找到taskList元素');
+                return;
+            }
+            console.log('找到taskList元素');
+
+            // 清空任务列表
+            taskListElement.innerHTML = '';
+
+            // 检查tasks数组
+            console.log('任务数据:', tasks);
+            console.log('任务数量:', tasks.length);
+
+            // 添加任务
+            tasks.forEach((task, index) => {
+                console.log('渲染任务:', index, task.title);
+                const taskDiv = document.createElement('div');
+                taskDiv.style.margin = '10px 0';
+                taskDiv.style.padding = '10px';
+                taskDiv.style.backgroundColor = '#f0f0f0';
+                taskDiv.style.borderRadius = '5px';
+                taskDiv.innerHTML = `
+                    <h3>${task.title}</h3>
+                    <p>${task.description}</p>
+                    <p>分类: ${getCategoryName(task.category)} | 时长: ${task.duration}分钟</p>
+                `;
+                taskListElement.appendChild(taskDiv);
+            });
+
+            console.log('任务列表渲染完成');
+        }
+
+        // 页面加载完成后渲染任务列表
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成');
+            renderTasks();
+        });
+    </script>
+</body>
+</html>

@@ -333,6 +333,10 @@
                 <div class="text-xl mb-1">💝</div>
                 <div class="text-xs">情绪</div>
             </a>
+            <a href="market.html" class="nav-item">
+                <div class="text-xl mb-1">🛒</div>
+                <div class="text-xs">市集</div>
+            </a>
             <a href="profile.html" class="nav-item">
                 <div class="text-xl mb-1">👤</div>
                 <div class="text-xs">我的</div>
@@ -404,7 +408,13 @@
             document.querySelectorAll('.mood-item').forEach(item => {
                 item.classList.remove('selected');
             });
-            event.target.closest('.mood-item').classList.add('selected');
+            // 找到被点击的元素并添加选中状态
+            const moodItems = document.querySelectorAll('.mood-item');
+            moodItems.forEach(item => {
+                if (item.onclick.toString().includes(`selectTodayMood('${mood}')`)) {
+                    item.classList.add('selected');
+                }
+            });
             
             window.appData.mood.today = mood;
             
@@ -662,12 +672,18 @@
                 );
                 
                 if (dayRecord) {
+                    // 完善情绪分数映射（1-5分，1分最差，5分最好）
                     const moodScores = {
-                        happy: 4,
+                        happy: 5,
+                        calm: 4,
+                        neutral: 3,
                         tired: 2,
+                        sad: 2,
+                        angry: 1,
                         stressed: 1,
                         anxious: 1
                     };
+                    // 获取情绪分数，如果没有找到则使用默认值3（中性）
                     moodData.push(moodScores[dayRecord.mood] || 3);
                 } else {
                     moodData.push(3); // 默认中性情绪
@@ -992,5 +1008,7 @@
     </script>
     <script src="main.js"></script>
     <script src="background-animation.js"></script>
+    <!-- 测试脚本，仅用于开发测试 -->
+    <!-- <script src="test_mood_functionality.js"></script> -->
 </body>
 </html>

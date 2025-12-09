@@ -504,6 +504,19 @@
             </div>
         </div>
 
+        <!-- 任务列表区域 -->
+        <div class="feature-card">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900">今日任务</h3>
+                <button onclick="openTaskModal()" class="text-green-600 text-sm font-medium hover:text-green-700">
+                    更多任务 →
+                </button>
+            </div>
+            <div id="dashboardTaskList" class="space-y-3">
+                <!-- 直接显示的任务列表 -->
+            </div>
+        </div>
+
         <!-- 植物养成区域 -->
         <div class="feature-card">
             <div class="text-center mb-4">
@@ -573,6 +586,37 @@
                 <!-- 动态生成推荐内容 -->
             </div>
         </div>
+
+        <!-- 养生市集模块 -->
+        <div class="feature-card">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900">养生市集</h3>
+                <a href="market.html" class="text-green-600 text-sm font-medium hover:text-green-700">
+                    查看全部 →
+                </a>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <!-- 热门产品 -->
+                <div class="product-item" onclick="window.location.href='market.html?product=tea'">
+                    <div class="product-image bg-green-100 rounded-lg p-4 text-center">
+                        <span class="text-3xl">🍵</span>
+                    </div>
+                    <div class="product-info mt-2">
+                        <div class="product-name font-medium">养生茶</div>
+                        <div class="product-price text-green-600">¥29.9起</div>
+                    </div>
+                </div>
+                <div class="product-item" onclick="window.location.href='market.html?product=hammer'">
+                    <div class="product-image bg-amber-100 rounded-lg p-4 text-center">
+                        <span class="text-3xl">🔨</span>
+                    </div>
+                    <div class="product-info mt-2">
+                        <div class="product-name font-medium">艾草锤</div>
+                        <div class="product-price text-green-600">¥39.9起</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- 浮动按钮 -->
@@ -594,6 +638,10 @@
             <a href="mood.html" class="nav-item">
                 <div class="text-xl mb-1">💝</div>
                 <div class="text-xs">情绪</div>
+            </a>
+            <a href="market.html" class="nav-item">
+                <div class="text-xl mb-1">🛒</div>
+                <div class="text-xs">市集</div>
             </a>
             <a href="profile.html" class="nav-item">
                 <div class="text-xl mb-1">👤</div>
